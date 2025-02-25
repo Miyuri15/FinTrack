@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ESNext",                                /* Use latest JavaScript features */
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],         /* Support for browser APIs */
+    "allowJs": true,                                  /* Allow JavaScript files */
+    "skipLibCheck": true,                             /* Skip checking type definitions */
+    "strict": true,                                   /* Enable strict type checking */
+    "forceConsistentCasingInFileNames": true,        /* Enforce case-sensitive imports */
+    
+    /* Modules */
+    "module": "NodeNext",                                 /* Use Node module system */
+    "moduleResolution": "NodeNext",                       /* Resolve modules like Node.js */
+    "esModuleInterop": true,                          /* Allow CommonJS module imports */
+    "allowSyntheticDefaultImports": true,            /* Allow default imports from modules */
+    "resolveJsonModule": true,                        /* Allow importing JSON files */
+    
+    /* React Specific */
+    "jsx": "react-jsx",                               /* Use modern React JSX transform */
+
+    /* Output & Emit */
+    "outDir": "./dist",                               /* Output directory */
+    "rootDir": "./src",                               /* Root directory for source files */
+    "noEmit": true,                                   /* Do not emit JS files */
+
+    /* Type Checking */
+    "noImplicitAny": true,                            /* No implicit 'any' types */
+    "strictNullChecks": true,                         /* Ensure proper null handling */
+    "strictFunctionTypes": true,                      /* Enforce function parameter types */
+    "noImplicitThis": true,                           /* Ensure 'this' is properly typed */
+    "noUnusedLocals": true,                           /* Prevent unused variables */
+    "noUnusedParameters": true,                       /* Prevent unused function parameters */
+    "noFallthroughCasesInSwitch": true,              /* Prevent fallthrough in switch cases */
+    
+    /* Experimental */
+    "isolatedModules": true                           /* Ensure each module can be compiled separately */
+  },
+  "include": ["src"],                                 /* Include all files in the 'src' folder */
+  "exclude": ["node_modules", "dist"]                /* Exclude build and dependency folders */
+}
