@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FiHome, FiClipboard, FiCreditCard, FiBarChart, FiUsers, FiFileText } from "react-icons/fi";
+import { FiHome, FiClipboard, FiCreditCard, FiBarChart, FiUsers, FiFileText, FiLogOut } from "react-icons/fi";
 
 const MenuBar = ({ isAdmin }) => {
   return (
@@ -12,11 +12,13 @@ const MenuBar = ({ isAdmin }) => {
         icon={<FiHome />}
         text="Dashboard"
       />
-    <MenuItem to="/budget-planning" icon={<FiClipboard />} text="Budget Planning" />
+    {!isAdmin &&<MenuItem to="/budget-planning" icon={<FiClipboard />} text="Budget Planning" />}
     <MenuItem to="/transactions" icon={<FiCreditCard />} text="Transactions" />
     <MenuItem to="/reports" icon={<FiFileText />} text="Reports" />
     <MenuItem to="/analytics" icon={<FiBarChart />} text="Analytics" />
     {isAdmin && <MenuItem to="/admin/users" icon={<FiUsers />} text="All Users" />}
+    <MenuItem to="/logout" icon={<FiLogOut />} text="LogOut" />
+
   </ul>
 </aside>
   );

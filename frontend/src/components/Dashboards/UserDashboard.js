@@ -1,10 +1,9 @@
 import React from "react";
-import MenuBar from "../MenuBar";
-import Navbar from "../Navbar";
-import { FiDollarSign, FiPieChart, FiShoppingCart, FiUser } from "react-icons/fi";
+import { FiDollarSign, FiPieChart, FiShoppingCart } from "react-icons/fi";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import Card from "./Card";
+import Layout from "../Layout";
 
 const UserDashboard = () => {
   const username = "JohnDoe"; // Replace with dynamic username
@@ -45,37 +44,37 @@ const UserDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-background-light dark:bg-gray-900 text-text-light dark:text-white">
-      <MenuBar isAdmin={false} />
-      <div className="flex-grow">
-        <Navbar username={username} />
-        <div className="p-8">
-          <h1 className="text-3xl font-bold text-blue-900 dark:text-blue-400 mb-8">
-            Welcome, {user.name}
-          </h1>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card title="Budget Plans" value={`$${user.budget}`} icon={<FiDollarSign />} />
-            <Card title="Transactions" value={user.transactions} icon={<FiShoppingCart />} />
-            <Card title="Reports" value={user.report} icon={<FiPieChart />} />
+    <Layout isAdmin={false} username={username}>
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Welcome Heading */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-400 mb-6 sm:mb-8">
+          Welcome, {user.name}
+        </h1>
+
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <Card title="Budget Plans" value={`$${user.budget}`} icon={<FiDollarSign />} />
+          <Card title="Transactions" value={user.transactions} icon={<FiShoppingCart />} />
+          <Card title="Reports" value={user.report} icon={<FiPieChart />} />
+        </div>
+
+        {/* Charts Grid */}
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+            <h2 className="text-lg sm:text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3 sm:mb-4">
+              Budget Flow
+            </h2>
+            <Line data={budgetFlowData} />
           </div>
-          {/* Two Charts Side by Side */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-              <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4">
-                Budget Flow
-              </h2>
-              <Line data={budgetFlowData} />
-            </div>
-            <div className="p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-              <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4">
-                Transactions Amount
-              </h2>
-              <Line data={transactionsData} />
-            </div>
+          <div className="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+            <h2 className="text-lg sm:text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3 sm:mb-4">
+              Transactions Amount
+            </h2>
+            <Line data={transactionsData} />
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
