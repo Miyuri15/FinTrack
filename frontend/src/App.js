@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/SignInAndSignUp/Login';
-import Budget from './components/Budget';
+import Budget from './components/BudgetPlaning/Budget';
 import Transactions from './components/Transactions';
 import Report from './components/Report';
 import Register from './components/SignInAndSignUp/Register';

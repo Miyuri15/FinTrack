@@ -12,7 +12,7 @@ const MenuBar = ({ isAdmin }) => {
         icon={<FiHome />}
         text="Dashboard"
       />
-    {!isAdmin &&<MenuItem to="/budget-planning" icon={<FiClipboard />} text="Budget Planning" />}
+    {!isAdmin &&<MenuItem to="/budget" icon={<FiClipboard />} text="Budget Planning" />}
     <MenuItem to="/transactions" icon={<FiCreditCard />} text="Transactions" />
     <MenuItem to="/reports" icon={<FiFileText />} text="Reports" />
     <MenuItem to="/analytics" icon={<FiBarChart />} text="Analytics" />
