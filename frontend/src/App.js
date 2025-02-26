@@ -8,22 +8,24 @@ import Report from './components/Report';
 import Register from './components/SignInAndSignUp/Register';
 import AdminDashboard from './components/Dashboards/AdminDashboard';
 import UserDashboard from './components/Dashboards/UserDashboard';
+import { ThemeProvider } from './ThemeContext';
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Register />} /> {/* Register Page */}
-        <Route path="/register" element={<Register />} /> {/* Register Page */}
-        <Route path="/login" element={<Login />} /> {/* Login Page */}
-        <Route path="/admindashboard" element={<AdminDashboard />} /> {/* Admin Dashboard Page */}
-        <Route path="/userdashboard" element={<UserDashboard />} /> {/*User  Dashboard Page */}
-        <Route path="/budget" element={<Budget />} /> {/* Budget Page */}
-        <Route path="/transaction" element={<Transactions />} /> {/* Transaction Page */}
-        <Route path="/report" element={<Report />} /> {/* Report Page */}
-
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} /> {/* Default to Login Page */}
+          <Route path="/register" element={<Register />} /> {/* Register Page */}
+          <Route path="/login" element={<Login />} /> {/* Login Page */}
+          <Route path="/admindashboard" element={<AdminDashboard />} /> {/* Admin Dashboard Page */}
+          <Route path="/userdashboard" element={<UserDashboard />} /> {/* User Dashboard Page */}
+          <Route path="/budget" element={<Budget />} /> {/* Budget Page */}
+          <Route path="/transactions" element={<Transactions />} /> {/* Transaction Page */}
+          <Route path="/reports" element={<Report />} /> {/* Report Page */}
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 };
 

@@ -1,51 +1,76 @@
 import React from "react";
 import MenuBar from "../MenuBar";
 import Navbar from "../Navbar";
+import { FiDollarSign, FiPieChart, FiShoppingCart, FiUser } from "react-icons/fi";
+import { Line } from "react-chartjs-2";
+import "chart.js/auto";
+import Card from "./Card";
 
 const UserDashboard = () => {
   const username = "JohnDoe"; // Replace with dynamic username
-
-  // Dummy data for the user
   const user = {
     name: "John Doe",
     email: "john@example.com",
-    role: "user",
-    budget: "$5000",
+    report: 4,
+    budget: 5000,
     transactions: 25,
   };
 
+  // Data for Budget Flow Chart
+  const budgetFlowData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [
+      {
+        label: "Budget Flow",
+        data: [5000, 4500, 4000, 3500, 3000, 2500], // Example data
+        fill: false,
+        borderColor: "#3b82f6", // Blue color
+        tension: 0.4,
+      },
+    ],
+  };
+
+  // Data for Transactions Amount Chart
+  const transactionsData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [
+      {
+        label: "Transactions Amount",
+        data: [200, 500, 800, 600, 1200, 900], // Example data
+        fill: false,
+        borderColor: "#10b981", // Green color
+        tension: 0.4,
+      },
+    ],
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Menu Bar */}
+    <div className="flex min-h-screen bg-background-light dark:bg-gray-900 text-text-light dark:text-white">
       <MenuBar isAdmin={false} />
-
-      {/* Main Content */}
       <div className="flex-grow">
-        {/* Navbar */}
         <Navbar username={username} />
-
-        {/* Dashboard Content */}
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-blue-900 mb-8">Welcome, {user.name}</h1>
-
-          {/* User Information Cards */}
+          <h1 className="text-3xl font-bold text-blue-900 dark:text-blue-400 mb-8">
+            Welcome, {user.name}
+          </h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Budget Card */}
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-blue-900">Budget</h2>
-              <p className="text-2xl font-bold mt-2">{user.budget}</p>
+            <Card title="Budget Plans" value={`$${user.budget}`} icon={<FiDollarSign />} />
+            <Card title="Transactions" value={user.transactions} icon={<FiShoppingCart />} />
+            <Card title="Reports" value={user.report} icon={<FiPieChart />} />
+          </div>
+          {/* Two Charts Side by Side */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+              <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4">
+                Budget Flow
+              </h2>
+              <Line data={budgetFlowData} />
             </div>
-
-            {/* Transactions Card */}
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-blue-900">Transactions</h2>
-              <p className="text-2xl font-bold mt-2">{user.transactions}</p>
-            </div>
-
-            {/* Role Card */}
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-blue-900">Role</h2>
-              <p className="text-2xl font-bold mt-2">{user.role}</p>
+            <div className="p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+              <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4">
+                Transactions Amount
+              </h2>
+              <Line data={transactionsData} />
             </div>
           </div>
         </div>

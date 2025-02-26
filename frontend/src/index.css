@@ -12,6 +12,20 @@ code {
     monospace;
 }
 
+
+
+/* Importing Tailwind's default styles */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Example of custom styles (if any) */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Add dark mode styles (example) */
+.dark {
+  background-color: #121212;
+  color: #ffffff;
+}

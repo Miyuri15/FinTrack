@@ -1,45 +1,39 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FiHome, FiClipboard, FiCreditCard, FiBarChart, FiUsers, FiFileText } from "react-icons/fi";
 
 const MenuBar = ({ isAdmin }) => {
   return (
-    <div className="bg-blue-900 text-white w-64 min-h-screen p-4">
-      <h2 className="text-2xl font-bold mb-8">FinTrack</h2>
-      <ul className="space-y-4">
-        <li>
-          <Link to="/dashboard" className="block hover:bg-blue-700 p-2 rounded">
-            Dashboard
-          </Link>
-        </li>
-        <li>
-          <Link to="/budget-planning" className="block hover:bg-blue-700 p-2 rounded">
-            Budget Planning
-          </Link>
-        </li>
-        <li>
-          <Link to="/transactions" className="block hover:bg-blue-700 p-2 rounded">
-            Transactions
-          </Link>
-        </li>
-        <li>
-          <Link to="/reports" className="block hover:bg-blue-700 p-2 rounded">
-            Reports
-          </Link>
-        </li>
-        <li>
-          <Link to="/analytics" className="block hover:bg-blue-700 p-2 rounded">
-            Analytics
-          </Link>
-        </li>
-        {isAdmin && (
-          <li>
-            <Link to="/admin/users" className="block hover:bg-blue-700 p-2 rounded">
-              All Users
-            </Link>
-          </li>
-        )}
-      </ul>
-    </div>
+<aside className="w-64 bg-[#eef3f6] dark:bg-gray-900 text-text-light dark:text-white h-min-screen p-4 shadow-md">
+  {/* <h2 className="text-3xl font-extrabold text-blue-600 dark:text-blue-400 mb-8">FinTrack</h2> */}
+  <ul className="space-y-4">
+    <MenuItem
+        to={isAdmin ? "/admindashboard" : "/userdashboard"}
+        icon={<FiHome />}
+        text="Dashboard"
+      />
+    <MenuItem to="/budget-planning" icon={<FiClipboard />} text="Budget Planning" />
+    <MenuItem to="/transactions" icon={<FiCreditCard />} text="Transactions" />
+    <MenuItem to="/reports" icon={<FiFileText />} text="Reports" />
+    <MenuItem to="/analytics" icon={<FiBarChart />} text="Analytics" />
+    {isAdmin && <MenuItem to="/admin/users" icon={<FiUsers />} text="All Users" />}
+  </ul>
+</aside>
+  );
+};
+
+const MenuItem = ({ to, icon, text }) => {
+  return (
+    <li>
+      <Link
+        to={to}
+        className="flex items-center gap-3 p-3 rounded-lg text-lg font-medium transition-all duration-300
+                  hover:bg-blue-800 hover:text-white dark:hover:bg-blue-400"
+      >
+        {icon}
+        <span>{text}</span>
+      </Link>
+    </li>
   );
 };
 
