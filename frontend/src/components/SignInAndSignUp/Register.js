@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
 import Swal from "sweetalert2";
+import Button from "./Button";
 
 function Register() {
   const navigate = useNavigate();

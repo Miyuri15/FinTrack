@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const AddBudgetForm = ({ budget, onClose, onAddBudget }) => {
   const [month, setMonth] = useState("");
@@ -37,22 +38,69 @@ const AddBudgetForm = ({ budget, onClose, onAddBudget }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if ((!month && !budgetName) || !amount || spendings.length === 0) {
       alert("Please enter a month or budget name, and add at least one spending category.");
       return;
     }
-
+  
     const newBudget = {
       month,
       budgetName,
       amount: parseFloat(amount),
       spendings,
     };
-    onAddBudget(budget ? { ...budget, ...newBudget } : newBudget); // Add or update budget
-  };
+  
+    // If we're editing a budget, we'll update it, otherwise we'll create a new one.
+    if (budget) {
+      // For editing the existing budget
+      onAddBudget({ ...budget, ...newBudget });
+    } else {
+      // For adding a new budget, make an API request
+      try {
+        const response = await fetch("http://localhost:5000/api/budgets", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(newBudget),
+        });
+  
+        if (response.ok) {
+          const addedBudget = await response.json();
+          onAddBudget(addedBudget); // Update parent component with new budget
 
+          // Show success alert
+          Swal.fire({
+            title: "Success!",
+            text: "Budget added successfully!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then(() => {
+            onClose(); // Close the form after the alert is confirmed
+          });
+        } else {
+          Swal.fire({
+            title: "Error!",
+            text: "Failed to add budget",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        }
+      } catch (error) {
+        console.error("Error adding budget:", error);
+        Swal.fire({
+          title: "Error!",
+          text: "An error occurred while adding the budget",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      }
+    }
+  };
+    
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -125,7 +173,11 @@ const AddBudgetForm = ({ budget, onClose, onAddBudget }) => {
                   type="text"
                   value={spending.category}
                   onChange={(e) =>
-                    handleUpdateSpending(spending.id, "category", e.target.value)
+                    handleUpdateSpending(
+                      spending.id,
+                      "category",
+                      e.target.value
+                    )
                   }
                   className="w-1/2 px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="Category"

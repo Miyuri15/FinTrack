@@ -2,6 +2,7 @@
 import React from 'react';
 import { FiSun, FiMoon } from 'react-icons/fi';
 import { useTheme } from '../ThemeContext';
+import { FaUser } from 'react-icons/fa';
 
 const Navbar = ({ username }) => {
   const { darkMode, setDarkMode } = useTheme();
@@ -28,12 +29,9 @@ const Navbar = ({ username }) => {
       {darkMode ? <FiSun className="text-yellow-500" /> : <FiMoon className="text-gray-900" />}
     </button>
 
+
     <div className="relative flex items-center space-x-2">
-      <img
-        src="/images/user-icon.png"
-        alt="User Icon"
-        className="w-10 h-10 rounded-full cursor-pointer"
-      />
+      <FaUser/>
       <span className="text-sm text-gray-700 dark:text-gray-300">{username}</span>
     </div>
   </div>

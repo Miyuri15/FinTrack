@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode"; // Correct import
+import Button from "./Button";
 
 function Login() {
   const navigate = useNavigate();

@@ -9,6 +9,7 @@ import Register from './components/SignInAndSignUp/Register';
 import AdminDashboard from './components/Dashboards/AdminDashboard';
 import UserDashboard from './components/Dashboards/UserDashboard';
 import { ThemeProvider } from './ThemeContext';
+import BudgetRecommendations from './components/BudgetPlaning/BudgetRecommendations';
 
 const App = () => {
   return (
@@ -23,6 +24,8 @@ const App = () => {
           <Route path="/budget" element={<Budget />} /> {/* Budget Page */}
           <Route path="/transactions" element={<Transactions />} /> {/* Transaction Page */}
           <Route path="/reports" element={<Report />} /> {/* Report Page */}
+          <Route path="/logout" element={<Login />} /> {/* Report Page */}
+          <Route path="/recommendations" element={<BudgetRecommendations />} />
         </Routes>
       </Router>
     </ThemeProvider>
