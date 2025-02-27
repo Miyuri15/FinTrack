@@ -61,8 +61,12 @@ router.post("/register", async (req, res) => {
         await newUser.save();
         console.log("User saved successfully:", newUser); // Debugging
 
-        // Return success response (no token)
-        res.status(201).json({ message: "User registered successfully" });
+        // Generate JWT token
+        const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        console.log("JWT Token generated:", token); // Log the token to the terminal
+
+        // Return success response with token
+        res.status(201).json({ message: "User registered successfully", token });
     } catch (error) {
         console.error("Registration failed:", error); // Debugging
         res.status(500).json({ message: "Registration failed" });
