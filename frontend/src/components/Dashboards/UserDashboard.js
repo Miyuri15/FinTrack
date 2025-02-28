@@ -6,7 +6,8 @@ import Card from "./Card";
 import Layout from "../Layout";
 
 const UserDashboard = () => {
-  const username = "JohnDoe"; // Replace with dynamic username
+  const username = localStorage.getItem("username");
+  
   const user = {
     name: "John Doe",
     email: "john@example.com",
@@ -48,7 +49,7 @@ const UserDashboard = () => {
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Welcome Heading */}
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-400 mb-6 sm:mb-8">
-          Welcome, {user.name}
+          Welcome, {username}
         </h1>
 
         {/* Cards Grid */}

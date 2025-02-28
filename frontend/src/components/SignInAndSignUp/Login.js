@@ -1,13 +1,15 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { jwtDecode } from "jwt-decode"; // Correct import
+import { jwtDecode } from "jwt-decode";
 import Button from "./Button";
+import { useAuth } from "../../context/AuthContext"; // Import useAuth
 
 function Login() {
   const navigate = useNavigate();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
+  const { login } = useAuth(); // Use the login function from AuthContext
 
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,42 +22,52 @@ function Login() {
     const enteredPassword = passwordInputRef.current.value;
 
     try {
-        const response = await fetch("http://localhost:5000/api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: enteredEmail, password: enteredPassword }),
-        });
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: enteredEmail, password: enteredPassword }),
+      });
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (!response.ok) {
-            throw new Error(result.message || "Login failed");
-        }
+      if (!response.ok) {
+        throw new Error(result.message || "Login failed");
+      }
 
-        // Store token in local storage
-        localStorage.setItem("token", result.token);
+      // Decode the token
+      const decodedToken = jwtDecode(result.token);
+      console.log("Decoded token:", decodedToken); // Debugging
 
-        // Decode the token
-        const decodedToken = jwtDecode(result.token); // Use jwtDecode directly
-        console.log("Decoded token:", decodedToken); // Debugging
+      // Store token in local storage
+      localStorage.setItem("token", result.token);
 
-        // Redirect based on role
-        if (decodedToken.role === "admin") {
-            navigate("/admindashboard");
-        } else {
-            navigate("/userdashboard");
-        }
+      // Create user object
+      const user = {
+        token: result.token,
+        username: decodedToken.username,
+        role: decodedToken.role,
+      };
+
+      // Set user in AuthContext
+      login(user);
+
+      // Redirect based on role
+      if (decodedToken.role === "admin") {
+        navigate("/admindashboard");
+      } else {
+        navigate("/userdashboard");
+      }
     } catch (error) {
-        setErrorMessage(error.message);
-        Swal.fire({
-            icon: "error",
-            title: "Login Failed",
-            text: error.message,
-            timer: 2000,
-            showConfirmButton: false,
-        });
+      setErrorMessage(error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error.message,
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -140,3 +152,4 @@ function Login() {
 }
 
 export default Login;
+
