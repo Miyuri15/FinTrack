@@ -11,7 +11,13 @@ const Navbar = () => {
   return (
     <nav className="bg-background-light dark:bg-gray-900 shadow-sm p-4 flex items-center justify-between mb-4">
       <div className="text-2xl font-bold text-blue-600 dark:text-white">
-        FinTrack
+      <img
+            src="/img/FintrackLogo.png"
+            alt="logo"
+            width={70}
+            height={40}
+            className="mb-5 mt-4 "
+          />
       </div>
 
       <div className="flex-grow mx-4">

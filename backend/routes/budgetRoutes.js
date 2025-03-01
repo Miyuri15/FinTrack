@@ -117,4 +117,14 @@ router.delete('/:id/spendings/:spendingId', authMiddleware, async (req, res) => 
   }
 });
 
+// Route to get count of budgets for the logged-in user
+router.get('/count', authMiddleware, async (req, res) => {
+  try {
+    const count = await Budget.countDocuments({ user: req.user.id });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching budget count' });
+  }
+});
+
 module.exports = router;

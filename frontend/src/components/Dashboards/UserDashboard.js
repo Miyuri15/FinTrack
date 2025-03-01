@@ -1,21 +1,59 @@
-import React from "react";
 import { FiDollarSign, FiPieChart, FiShoppingCart } from "react-icons/fi";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import Card from "./Card";
 import Layout from "../Layout";
+import { useAuth } from "../../context/AuthContext";
+import React, { useEffect, useState } from "react";
 
 const UserDashboard = () => {
-  const username = localStorage.getItem("username");
-  
-  const user = {
+  const { user } = useAuth(); // Get the user from AuthContext
+
+  const [count, setCount] = useState({
     name: "John Doe",
     email: "john@example.com",
-    report: 4,
-    budget: 5000,
-    transactions: 25,
-  };
-
+    goal: 0, // Initialize with 0
+    budget: 0, // Initialize with 0
+    transactions: 0, // Initialize with 0
+  });  const [loading, setLoading] = useState(true);
+  // Fetch data from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch budget plans count
+        const budgetResponse = await fetch("http://localhost:5000/api/budgets/count",
+          { headers: { Authorization: `Bearer ${user.token}` } }
+        );
+        const budgetData = await budgetResponse.json();
+  
+        // Fetch transactions count
+        const transactionsResponse = await fetch("http://localhost:5000/api/transactions/count",
+          { headers: { Authorization: `Bearer ${user.token}` } }
+        );
+        const transactionsData = await transactionsResponse.json();
+  
+        // Fetch goals count
+        // const goalsResponse = await fetch("http://localhost:5000/api/goals/count",
+        // { headers: { Authorization: `Bearer ${user.token}` } });
+        // const goalsData = await goalsResponse.json();
+  
+        // Update state with fetched data
+        setCount({
+          ...count,
+          budget: budgetData.count,
+          transactions: transactionsData.count,
+          // goal: goalsData.count,
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
   // Data for Budget Flow Chart
   const budgetFlowData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
@@ -44,19 +82,31 @@ const UserDashboard = () => {
     ],
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Layout isAdmin={false} username={username}>
+    <Layout isAdmin={false}>
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Welcome Heading */}
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-400 mb-6 sm:mb-8">
-          Welcome, {username}
+          Welcome, {user ? user.username : "Guest"}
         </h1>
 
         {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <Card title="Budget Plans" value={`$${user.budget}`} icon={<FiDollarSign />} />
-          <Card title="Transactions" value={user.transactions} icon={<FiShoppingCart />} />
-          <Card title="Reports" value={user.report} icon={<FiPieChart />} />
+          <Card
+            title="Budget Plans"
+            value={`${count.budget}`}
+            icon={<FiDollarSign />}
+          />
+          <Card
+            title="Transactions"
+            value={count.transactions}
+            icon={<FiShoppingCart />}
+          />
+          <Card title="Goals" value={count.goal} icon={<FiPieChart />} />{" "}
         </div>
 
         {/* Charts Grid */}

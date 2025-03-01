@@ -57,11 +57,11 @@ function Register() {
       {/* Left Side with Image and Intro Text */}
       <div
         className="relative hidden h-full md:flex md:w-3/5 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/loginscrn.jpg')" }}
+        style={{ backgroundImage: "url('/img/logincover.jpg')" }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-transparent opacity-70"></div>
         <div className="absolute top-9 left-9 cursor-pointer w-90 h-90">
-          <img src="/images/logo.png" alt="Logo" className="w-140 h-34 mx-5" />
+          <img src="/img/FintrackLogo.png" alt="Logo" className="w-40 h-34 mx-5" />
         </div>
         <div className="flex flex-col items-start justify-end p-10 bg-blue-900 bg-opacity-30 text-white h-full w-full">
           <h1 className="text-3xl font-bold mb-5">Register</h1>
@@ -77,9 +77,9 @@ function Register() {
       <div className="flex flex-col justify-center md:w-2/5 p-8">
         <div className="flex flex-col items-center">
           <img
-            src="/images/logo.png"
+            src="/img/FintrackLogo.png"
             alt="logo"
-            width={140}
+            width={40}
             height={40}
             className="mb-8 ml-10 md:hidden"
           />
@@ -94,7 +94,7 @@ function Register() {
           <div className="flex space-x-4">
             <button
               onClick={() => setIsAdmin(false)}
-              className={`w-full border-2 border-gray-300 rounded-lg ${
+              className={`w-full border-2 border-gray-300 rounded-lg py-2 ${
                 !isAdmin ? "bg-blue-900 text-white" : "bg-gray-50 text-blue-900"
               }`}
             >
@@ -176,6 +176,13 @@ function Register() {
               {isLoading ? "Registering..." : "Register"}
             </Button>
           </form>
+          <p className="text-md font-medium text-center mt-2 text-black">
+          Already have an account?{" "}
+          <a href="/login" className="text-blue-900 font-bold">
+            Login
+          </a>
+        </p>
+
         </div>
       </div>
     </div>

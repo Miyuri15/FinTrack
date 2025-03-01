@@ -76,15 +76,15 @@ function Login() {
       {/* Left Side with Image and Intro Text */}
       <div
         className="relative hidden h-full md:flex md:w-3/5 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/loginscrn.jpg')" }}
+        style={{ backgroundImage: "url('/img/logincover.jpg')" }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-transparent opacity-70"></div>
         <div className="absolute top-9 left-9 cursor-pointer w-90 h-90">
-          <img src="/images/logo.png" alt="Logo" className="w-140 h-34 mx-5" />
+          <img src="/img/FintrackLogo.png" alt="Logo" className="w-40 h-34 mx-5" />
         </div>
         <div className="flex flex-col items-start justify-end p-10 bg-blue-900 bg-opacity-30 text-white h-full w-full">
           <h1 className="text-3xl font-bold mb-5">Login</h1>
-          <h2 className="text-4xl font-extrabold mb-3">SKILLS CAREERS</h2>
+          <h2 className="text-4xl font-extrabold mb-3">FINTRACK</h2>
           <p className="text-md leading-relaxed mb-9">
             Welcome to Skill Careers, where finding your dream job or the right
             talent is just a click away.
@@ -96,9 +96,9 @@ function Login() {
       <div className="flex flex-col justify-center md:w-2/5 p-8">
         <div className="flex flex-col items-center mb-4">
           <img
-            src="/images/logo.png"
+            src="/img/FintrackLogo.png"
             alt="logo"
-            width={140}
+            width={40}
             height={40}
             className="mb-5 ml-10 md:hidden"
           />

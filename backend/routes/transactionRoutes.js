@@ -89,5 +89,15 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     }
 });
 
+// Route to get count of transactions for the logged-in user
+router.get('/count', authMiddleware, async (req, res) => {
+    try {
+      const count = await Transaction.countDocuments({ user: req.user.id });
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching transaction count' });
+    }
+  });
+  
 
 module.exports = router;
