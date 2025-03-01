@@ -93,7 +93,7 @@ function Login() {
       </div>
 
       {/* Right Side with Form */}
-      <div className="flex flex-col justify-center md:w-2/5 p-8">
+      <div className="flex flex-col justify-center md:w-2/5 p-8 bg-blue-200">
         <div className="flex flex-col items-center mb-4">
           <img
             src="/img/FintrackLogo.png"
@@ -102,10 +102,10 @@ function Login() {
             height={40}
             className="mb-5 ml-10 md:hidden"
           />
-          <h2 className="text-xl text-blue-900 font-semibold text-center mb-2">
+          <h2 className="text-xl text-blue-900  font-semibold text-center mb-2">
             Welcome Back! Let's Get You Started.
           </h2>
-          <p className="text-blue-900 text-center text-md mt-4 mb-4 font-medium">
+          <p className="text-blue-900  text-center text-md mt-4 mb-4 font-medium">
             Log in to access your account and continue your Financial Planing
           </p>
         </div>
@@ -140,9 +140,9 @@ function Login() {
           </Button>
         </form>
 
-        <p className="text-md font-medium text-center mt-2 text-black">
+        <p className="text-md font-medium text-center mt-2 text-black dark:text-blue-600">
           Don’t have an account?{" "}
-          <a href="/register" className="text-blue-900 font-bold">
+          <a href="/register" className="text-blue-900  font-bold">
             Register
           </a>
         </p>

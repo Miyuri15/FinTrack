@@ -74,22 +74,16 @@ function Register() {
       </div>
 
       {/* Right Side with Form */}
-      <div className="flex flex-col justify-center md:w-2/5 p-8">
+      <div className="flex flex-col justify-center md:w-2/5 p-8 bg-blue-200">
         <div className="flex flex-col items-center">
-          <img
-            src="/img/FintrackLogo.png"
-            alt="logo"
-            width={40}
-            height={40}
-            className="mb-8 ml-10 md:hidden"
-          />
-          <p className="text-blue-900 text-center text-md font-semibold">
+          
+          <p className="text-blue-900  text-center text-md font-semibold">
             Create your free account to manage your finances, track expenses, and
             take control of your financial journey.
           </p>
         </div>
 
-        <div className="flex flex-col justify-center mt-12">
+        <div className="flex flex-col justify-center mt-6">
           {/* User / Admin Selection */}
           <div className="flex space-x-4">
             <button
@@ -114,7 +108,7 @@ function Register() {
             </button>
           </div>
 
-          <h2 className="text-medium text-center text-blue-900 font-bold my-10">
+          <h2 className="text-medium text-center text-blue-900  font-bold my-3">
             Join FinTrack and Take Control of Your Finances!
           </h2>
 
@@ -176,9 +170,9 @@ function Register() {
               {isLoading ? "Registering..." : "Register"}
             </Button>
           </form>
-          <p className="text-md font-medium text-center mt-2 text-black">
+          <p className="text-md font-medium text-center mt-2 text-black dark:text-blue-600">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-900 font-bold">
+          <a href="/login" className="text-blue-900  font-bold">
             Login
           </a>
         </p>
