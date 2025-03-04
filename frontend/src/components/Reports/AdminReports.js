@@ -128,7 +128,7 @@ export default function AdminReports({ username }) {
                 onChange={(e) =>
                   setFilters({ ...filters, startDate: e.target.value })
                 }
-                className="p-2 border rounded"
+                className="p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
               <input
                 type="date"
@@ -136,7 +136,7 @@ export default function AdminReports({ username }) {
                 onChange={(e) =>
                   setFilters({ ...filters, endDate: e.target.value })
                 }
-                className="p-2 border rounded"
+                className="p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
             <div className="flex space-x-4">
@@ -147,7 +147,7 @@ export default function AdminReports({ username }) {
                 onChange={(e) =>
                   setFilters({ ...filters, category: e.target.value })
                 }
-                className="p-2 border rounded"
+                className="p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
               <input
                 type="text"
@@ -156,7 +156,7 @@ export default function AdminReports({ username }) {
                 onChange={(e) =>
                   setFilters({ ...filters, tags: e.target.value })
                 }
-                className="p-2 border rounded"
+                className="p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -164,28 +164,28 @@ export default function AdminReports({ username }) {
           {/* Transactions Table */}
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-200">
-                <th className="p-2 border">Date</th>
-                <th className="p-2 border">Username</th>
-                <th className="p-2 border">Category</th>
-                <th className="p-2 border">Type</th>
-                <th className="p-2 border">Amount</th>
-                <th className="p-2 border">Tags</th>
+              <tr className="bg-gray-200 dark:bg-gray-700">
+                <th className="p-2 border dark:border-gray-600">Date</th>
+                <th className="p-2 border dark:border-gray-600">Username</th>
+                <th className="p-2 border dark:border-gray-600">Category</th>
+                <th className="p-2 border dark:border-gray-600">Type</th>
+                <th className="p-2 border dark:border-gray-600">Amount</th>
+                <th className="p-2 border dark:border-gray-600">Tags</th>
               </tr>
             </thead>
             <tbody>
               {filteredTransactions.map((t) => (
-                <tr key={t._id} className="border">
-                  <td className="p-2 border">
+                <tr key={t._id} className="border dark:border-gray-600">
+                  <td className="p-2 border dark:border-gray-600">
                     {new Date(t.date).toLocaleDateString()}
                   </td>
-                  <td className="p-2 border">
+                  <td className="p-2 border dark:border-gray-600">
                     {t.user ? t.user.username : "Unknown User"}
                   </td>
-                  <td className="p-2 border">{t.category}</td>
-                  <td className="p-2 border">{t.type}</td>
-                  <td className="p-2 border">{t.amount}</td>
-                  <td className="p-2 border">{t.tags.join(", ")}</td>
+                  <td className="p-2 border dark:border-gray-600">{t.category}</td>
+                  <td className="p-2 border dark:border-gray-600">{t.type}</td>
+                  <td className="p-2 border dark:border-gray-600">{t.amount}</td>
+                  <td className="p-2 border dark:border-gray-600">{t.tags.join(", ")}</td>
                 </tr>
               ))}
             </tbody>
@@ -199,6 +199,7 @@ export default function AdminReports({ username }) {
           reportData={reportData}
           onClose={() => setShowReportPopup(false)}
           onDownload={downloadReport}
+          isAdmin={isAdmin}
         />
       )}
     </div>

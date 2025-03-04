@@ -1,8 +1,10 @@
 const express = require('express');
 const Budget = require('../models/Budget');
 const authMiddleware = require('../middleware/authMiddleware');
-
+const Transaction = require("../models/Transaction");
 const router = express.Router();
+const { v4: uuidv4 } = require("uuid");
+const Recommendation = require("../models/Recommendation");
 
 // Create a new budget
 router.post('/', authMiddleware, async (req, res) => {
@@ -140,5 +142,105 @@ router.get('/count', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Error fetching budget count' });
   }
 });
+
+// Function to analyze spending trends (without transactions)
+const analyzeSpendingTrends = async (budgets) => {
+  const recommendations = [];
+
+  budgets.forEach((budget) => {
+    const { month, spendings, amount: totalBudget } = budget;
+    const totalSpent = spendings.reduce((sum, spending) => sum + spending.spent, 0);
+    const percentageUsed = (totalSpent / totalBudget) * 100;
+
+    if (percentageUsed > 100) {
+      recommendations.push({
+        id: uuidv4(),
+        month,
+        message: `In ${month}, you exceeded your total budget by ${(percentageUsed - 100).toFixed(2)}%. Consider reducing your spending.`,
+      });
+    } else if (percentageUsed < 80) {
+      recommendations.push({
+        id: uuidv4(),
+        month,
+        message: `In ${month}, you used only ${percentageUsed.toFixed(2)}% of your total budget. Consider reallocating funds to other categories.`,
+      });
+    }
+
+    spendings.forEach((spending) => {
+      const { category, amount: categoryBudget, spent } = spending;
+      const categoryPercentageUsed = (spent / categoryBudget) * 100;
+
+      if (categoryPercentageUsed > 100) {
+        recommendations.push({
+          id: uuidv4(),
+          category,
+          month,
+          message: `In ${month}, you exceeded your ${category} budget by ${(categoryPercentageUsed - 100).toFixed(2)}%. Consider reducing spending in this category.`,
+        });
+      } else if (categoryPercentageUsed < 80) {
+        recommendations.push({
+          id: uuidv4(),
+          category,
+          month,
+          message: `In ${month}, you used only ${categoryPercentageUsed.toFixed(2)}% of your ${category} budget. Consider reallocating funds to other categories.`,
+        });
+      }
+    });
+  });
+
+  // Save recommendations to the DB
+  await Recommendation.insertMany(recommendations);
+  return recommendations;
+};
+
+// Route to save recommendations to the DB
+router.post("/recommendations", authMiddleware, async (req, res) => {
+  try {
+    const { recommendations } = req.body;
+
+    // Save each recommendation
+    const savedRecommendations = await Recommendation.insertMany(recommendations);
+
+    res.status(201).json({ message: "Recommendations saved successfully", data: savedRecommendations });
+  } catch (error) {
+    console.error("Error saving recommendations:", error);
+    res.status(500).json({ message: "Failed to save recommendations" });
+  }
+});
+
+
+// Route to get budget recommendations
+router.get("/recommendations", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const budgets = await Budget.find({ user: userId });
+
+    console.log("Fetched Budgets:", JSON.stringify(budgets, null, 2));
+
+    // Analyze and store recommendations
+    await analyzeSpendingTrends(budgets);
+
+    // Fetch recommendations from DB
+    const recommendations = await Recommendation.find({});
+    res.json(recommendations);
+  } catch (error) {
+    console.error("Error fetching recommendations:", error);
+    res.status(500).json({ message: "Failed to fetch recommendations" });
+  }
+});
+
+// Route to delete a recommendation
+router.delete("/recommendations/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Recommendation.findOneAndDelete({ id });
+
+    res.json({ message: "Recommendation deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting recommendation:", error);
+    res.status(500).json({ message: "Failed to delete recommendation" });
+  }
+});
+
 
 module.exports = router;

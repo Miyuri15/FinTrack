@@ -11,16 +11,20 @@ import {
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 
-const MenuBar = ({ isAdmin }) => {
+const MenuBar = () => {
   const location = useLocation();
-  const { logout } = useAuth();
-  const navigate = useNavigate(); // For redirecting after logout
-
-  const isAdminRoute = location.pathname.startsWith("/admin");
+  const { user, logout } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); // Call the logout function
-    navigate("/login"); // Redirect to login page
+    logout();
+    navigate("/login");
+  };
+
+  // Function to check if a route is active
+  const isActive = (path) => {
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -30,27 +34,41 @@ const MenuBar = ({ isAdmin }) => {
           to={isAdmin ? "/admindashboard" : "/userdashboard"}
           icon={<FiHome />}
           text="Dashboard"
+          isActive={isActive(isAdmin ? "/admindashboard" : "/userdashboard")}
         />
         {!isAdmin && (
           <MenuItem
             to="/budget"
             icon={<FiClipboard />}
             text="Budget Planning"
+            isActive={isActive("/budget")}
           />
         )}
         <MenuItem
           to={isAdmin ? "/adminTransactions" : "/userTransactions"}
           icon={<FiCreditCard />}
           text="Transactions"
+          isActive={isActive(isAdmin ? "/adminTransactions" : "/userTransactions")}
         />
         <MenuItem
           to={isAdmin ? "/adminReports" : "/userReports"}
           icon={<FiFileText />}
           text="Reports"
-        />{" "}
-        <MenuItem to="/analytics" icon={<FiBarChart />} text="Analytics" />
+          isActive={isActive(isAdmin ? "/adminReports" : "/userReports")}
+        />
+        <MenuItem
+          to="/analytics"
+          icon={<FiBarChart />}
+          text="Analytics"
+          isActive={isActive("/analytics")}
+        />
         {isAdmin && (
-          <MenuItem to="/allUsers" icon={<FiUsers />} text="All Users" />
+          <MenuItem
+            to="/allUsers"
+            icon={<FiUsers />}
+            text="All Users"
+            isActive={isActive("/allUsers")}
+          />
         )}
         {/* Logout Button */}
         <li>
@@ -68,13 +86,17 @@ const MenuBar = ({ isAdmin }) => {
   );
 };
 
-const MenuItem = ({ to, icon, text }) => {
+const MenuItem = ({ to, icon, text, isActive }) => {
   return (
     <li>
       <Link
         to={to}
-        className="flex items-center gap-3 p-3 rounded-lg text-lg font-medium transition-all duration-300
-                  hover:bg-blue-800 hover:text-white dark:hover:bg-blue-400"
+        className={`flex items-center gap-3 p-3 rounded-lg text-lg font-medium transition-all duration-300
+                  hover:bg-blue-800 hover:text-white dark:hover:bg-blue-400 ${
+                    isActive
+                      ? "bg-blue-800 text-white dark:bg-blue-400"
+                      : "bg-transparent"
+                  }`}
       >
         {icon}
         <span>{text}</span>

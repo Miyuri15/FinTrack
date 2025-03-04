@@ -4,6 +4,7 @@ import Layout from "../Layout";
 import { FaLightbulb, FaPen, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
+import BudgetRecommendations from "./BudgetRecommendations";
 
 const Budget = () => {
   const [showForm, setShowForm] = useState(false);
@@ -197,14 +198,15 @@ const Budget = () => {
     <Layout>
       <div className="p-6 max-w-7xl mx-auto">
         {/* Recommendation Portal Button */}
-        <div className="text-center mb-6">
+        {/* <div className="text-center mb-6">
                   <Link
                     to="/recommendations"
                     className="bg-green-600 text-white text-xl font-semibold px-8 py-4 rounded-lg shadow-lg hover:bg-green-700 transition-all flex items-center justify-center gap-2"
                   >
                     <FaLightbulb /> Budget Planning Recommendations
                   </Link>
-                </div>
+                </div> */}
+                <BudgetRecommendations/>
         {/* Centered and large button */}
         <div className="text-center mb-6">
           <button

@@ -1,76 +1,120 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { FaTimes } from "react-icons/fa"; // Import close icon from React Icons
+import Swal from "sweetalert2";
 
 const BudgetRecommendations = () => {
+  const [recommendations, setRecommendations] = useState([]);
+
+  const fetchRecommendations = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/budgets/recommendations", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log("Response from backend:", response.data);
+      setRecommendations(response.data);
+    } catch (error) {
+      console.error("Failed to fetch recommendations:", error);
+    }
+  };
+
+  const deleteRecommendation = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This recommendation will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      timer: 10000, // 10 sec timer
+      timerProgressBar: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`http://localhost:5000/api/budgets/recommendations/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+  
+          Swal.fire({
+            title: "Deleted!",
+            text: "The recommendation has been removed.",
+            icon: "success",
+            timer: 1000, // 1-second delay before disappearing
+            showConfirmButton: false,
+          });
+  
+          // Remove from UI
+          setRecommendations((prev) => prev.filter((rec) => rec.id !== id));
+        } catch (error) {
+          console.error("Error deleting recommendation:", error);
+          Swal.fire("Error!", "Failed to delete recommendation.", "error");
+        }
+      }
+    });
+  };
+  useEffect(() => {
+    fetchRecommendations();
+  }, []);
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-6">
-        Budget Planning Recommendations
-      </h2>
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h3 className="text-xl font-semibold mb-4">Tips for Effective Budgeting</h3>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
-          <li className="mb-2">Track your expenses regularly.</li>
-          <li className="mb-2">Set realistic financial goals.</li>
-          <li className="mb-2">Allocate funds for savings and emergencies.</li>
-          <li className="mb-2">Use the 50/30/20 rule: 50% needs, 30% wants, 20% savings.</li>
-          <li className="mb-2">Review and adjust your budget monthly.</li>
-        </ul>
-
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-4">Common Budgeting Mistakes to Avoid</h3>
-          <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
-            <li className="mb-2">Not accounting for irregular expenses (e.g., car repairs, medical bills).</li>
-            <li className="mb-2">Underestimating discretionary spending.</li>
-            <li className="mb-2">Setting too aggressive savings goals, leaving no room for flexibility.</li>
-            <li className="mb-2">Failing to review your budget regularly.</li>
-          </ul>
-        </div>
-
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-4">Interactive Tools</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
-              <h4 className="font-semibold">Expense Tracker</h4>
-              <p className="text-sm">Track your daily expenses and categorize them.</p>
+    <div className="p-4 bg-white dark:bg-gray-800 shadow-md rounded-lg mb-10">
+      <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Budget Recommendations</h2>
+      {recommendations.length > 0 ? (
+        <div className="space-y-3 max-h-64 overflow-y-auto no-scrollbar">
+          {recommendations.slice(0, 3).map((rec, index) => (
+            <div key={rec.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between items-center">
+              <div>
+                {rec.category ? (
+                  <p className="text-gray-800 dark:text-gray-200">
+                    <strong>{rec.category} (Month: {rec.month}):</strong> {rec.message}
+                  </p>
+                ) : (
+                  <p className="text-gray-800 dark:text-gray-200">
+                    <strong>Overall Budget (Month: {rec.month}):</strong> {rec.message}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => deleteRecommendation(rec.id)} // Pass `rec.id`
+                className="text-gray-500 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"              >
+                <FaTimes /> {/* Close icon */}
+              </button>
             </div>
-            <div className="bg-green-100 dark:bg-green-900 p-4 rounded-lg">
-              <h4 className="font-semibold">Savings Calculator</h4>
-              <p className="text-sm">Calculate how much you need to save for your goals.</p>
+          ))}
+          {recommendations.length > 3 && (
+            <div className="space-y-3">
+              {recommendations.slice(3).map((rec, index) => (
+                <div key={rec.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between items-center">
+                  <div>
+                    {rec.category ? (
+                      <p className="text-gray-800 dark:text-gray-200">
+                        <strong>{rec.category} (Month: {rec.month}):</strong> {rec.message}
+                      </p>
+                    ) : (
+                      <p className="text-gray-800 dark:text-gray-200">
+                        <strong>Overall Budget (Month: {rec.month}):</strong> {rec.message}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => deleteRecommendation(rec.id)} // Pass `rec.id`
+                    className="text-gray-500 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
+                  >
+                    <FaTimes /> {/* Close icon */}
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
-
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-4">Additional Resources</h3>
-          <p className="text-gray-700 dark:text-gray-300">
-            Explore these resources to deepen your budgeting knowledge and improve your financial planning:
-          </p>
-          <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 mt-4">
-            <li className="mb-2">Budgeting for Beginners (Article)</li>
-            <li className="mb-2">Free Budgeting Workshops (Webinars)</li>
-            <li className="mb-2">Financial Planning Tools (Websites)</li>
-          </ul>
-        </div>
-
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-4">Budgeting Templates</h3>
-          <p className="text-gray-700 dark:text-gray-300">
-            Download these templates to kickstart your budgeting journey:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
-              <h4 className="font-semibold">Monthly Budget Template</h4>
-              <p className="text-sm">A simple template to manage your monthly expenses.</p>
-              <button className="text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 mt-2 rounded-lg">Download</button>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
-              <h4 className="font-semibold">Annual Budget Planner</h4>
-              <p className="text-sm">A yearly template to track long-term financial goals.</p>
-              <button className="text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 mt-2 rounded-lg">Download</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      ) : (
+        <p className="text-gray-800 dark:text-gray-200">No recommendations available.</p>
+      )}
     </div>
   );
 };
