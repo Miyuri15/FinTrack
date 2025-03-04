@@ -11,59 +11,58 @@ export default function AllUsers() {
 
   // Fetch all users
   useEffect(() => {
-    
     const fetchUsers = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/auth/all", {
           headers: {
-            Authorization: `Bearer ${user.token}`, // Pass the JWT token
+            Authorization: `Bearer ${user.token}`,
           },
         });
         const data = await response.json();
         if (response.ok) {
-          setUsers(data); // Set the users data
+          setUsers(data);
         } else {
           setError("Failed to fetch users");
         }
       } catch (error) {
         setError("Error fetching users");
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
-
+  
     fetchUsers();
   }, [user.token]);
 
-  // Handle Restrict/Unrestrict User
-  const handleRestrictUser = async (userId, isRestricted) => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/auth/${userId}/restrict`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-          body: JSON.stringify({ isRestricted: !isRestricted }), // Toggle restriction status
-        }
-      );
 
-      if (response.ok) {
-        // Update the users list with the new restriction status
-        setUsers((prevUsers) =>
-          prevUsers.map((u) =>
-            u._id === userId ? { ...u, isRestricted: !isRestricted } : u
-          )
-        );
-      } else {
-        setError("Failed to update user status");
+const handleRestrictUser = async (userId, isRestricted) => {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/auth/${userId}/restrict`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ isRestricted: !isRestricted }),
       }
-    } catch (error) {
-      setError("Error updating user status");
+    );
+
+    if (response.ok) {
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u._id === userId ? { ...u, isRestricted: !isRestricted } : u
+        )
+      );
+    } else {
+      setError("Failed to update user status");
     }
-  };
+  } catch (error) {
+    setError("Error updating user status");
+  }
+};
+
 
   if (loading) {
     return <div>Loading...</div>;

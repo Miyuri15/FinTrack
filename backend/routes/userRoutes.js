@@ -101,12 +101,42 @@ router.post("/register", async (req, res) => {
 });
 
 // Login Route
+// router.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch)
+//       return res.status(400).json({ message: "Invalid credentials" });
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       { id: user._id, role: user.role, username: user.username },
+//       process.env.JWT_SECRET,
+//       { expiresIn: "1h" }
+//     );
+
+//     res.json({ token });
+//   } catch (error) {
+//     res.status(500).json({ message: "Login failed" });
+//   }
+// });
+
+// Login Route
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+    // Check if the user is restricted
+    if (user.isRestricted) {
+      return res.status(403).json({ message: "User is restricted and cannot log in" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
@@ -132,12 +162,13 @@ router.get('/all', authMiddleware, async (req, res) => {
       return res.status(403).json({ error: 'Access denied. Admins only.' });
     }
 
-    const users = await User.find({}, 'username email role');
+    const users = await User.find({}, 'username email role isRestricted');
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching users' });
   }
 });
+
 
 // Backend Route: /api/users/:userId/restrict
 router.put("/:userId/restrict", authMiddleware, async (req, res) => {
@@ -153,5 +184,6 @@ router.put("/:userId/restrict", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Error updating user status" });
   }
 });
+
 
 module.exports = router;
