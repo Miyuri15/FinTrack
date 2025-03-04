@@ -45,6 +45,20 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// Get all budgets (Admin Only)
+router.get('/all', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Admins only.' });
+    }
+
+    const budgets = await Budget.find({}).populate('user', 'username email');
+    res.json(budgets);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching budgets' });
+  }
+});
+
 // Update a budget
 router.put('/:id', authMiddleware, async (req, res) => {
   try {

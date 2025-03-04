@@ -43,10 +43,14 @@ const MenuBar = ({ isAdmin }) => {
           icon={<FiCreditCard />}
           text="Transactions"
         />
-        <MenuItem to="/reports" icon={<FiFileText />} text="Reports" />
+        <MenuItem
+          to={isAdmin ? "/adminReports" : "/userReports"}
+          icon={<FiFileText />}
+          text="Reports"
+        />{" "}
         <MenuItem to="/analytics" icon={<FiBarChart />} text="Analytics" />
         {isAdmin && (
-          <MenuItem to="/admin/users" icon={<FiUsers />} text="All Users" />
+          <MenuItem to="/allUsers" icon={<FiUsers />} text="All Users" />
         )}
         {/* Logout Button */}
         <li>

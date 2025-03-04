@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
     username: { type: String, unique: true }, // Automatically generated
     adminName: { type: String }, // Optional, only for admins
     organization: { type: String }, // Optional, only for admins
+    isRestricted: { type: Boolean, default: false }
 }, { timestamps: true });
 
 

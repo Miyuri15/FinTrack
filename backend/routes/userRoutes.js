@@ -125,5 +125,33 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Get all users (Admin Only)
+router.get('/all', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Admins only.' });
+    }
+
+    const users = await User.find({}, 'username email role');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching users' });
+  }
+});
+
+// Backend Route: /api/users/:userId/restrict
+router.put("/:userId/restrict", authMiddleware, async (req, res) => {
+  try {
+    const { isRestricted } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.userId,
+      { isRestricted },
+      { new: true }
+    );
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating user status" });
+  }
+});
 
 module.exports = router;

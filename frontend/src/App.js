@@ -3,7 +3,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/SignInAndSignUp/Login';
 import Budget from './components/BudgetPlaning/Budget';
-import Report from './components/Report';
 import Register from './components/SignInAndSignUp/Register';
 import AdminDashboard from './components/Dashboards/AdminDashboard';
 import UserDashboard from './components/Dashboards/UserDashboard';
@@ -13,6 +12,10 @@ import AdminTransactions from './components/Transactions/AdminTransactions';
 import UserTransactions from './components/Transactions/UserTransactions';
 import { AuthProvider } from './context/AuthContext';
 import TransactionsPage from './components/Transactions/TransactionsPage';
+import UserReports from './components/Reports/UserReports';
+import AdminReports from './components/Reports/AdminReports';
+import Analytics from './components/Analytics/Analytics';
+import AllUsers from './components/AllUsers/AllUsers';
 
 const App = () => {
   const isAdmin = true;
@@ -29,13 +32,15 @@ const App = () => {
           <Route path="/admindashboard" element={<AdminDashboard />} /> {/* Admin Dashboard Page */}
           <Route path="/userdashboard" element={<UserDashboard />} /> {/* User Dashboard Page */}
           <Route path="/budget" element={<Budget />} /> {/* Budget Page */}
-          <Route path="/reports" element={<Report />} /> {/* Report Page */}
           <Route path="/logout" element={<Login />} /> {/* Report Page */}
           <Route path="/recommendations" element={<BudgetRecommendations />} />
           <Route path="/adminTransactions" element={<AdminTransactions />} />
           <Route path="/userTransactions" element={<UserTransactions />} />
           <Route path="/transactions" element={<TransactionsPage />} />
-
+          <Route path="/userReports" element={<UserReports />} /> {/* Report Page */}
+          <Route path="/adminReports" element={<AdminReports />} /> {/* Report Page */}
+          <Route path="/analytics" element={<Analytics />} /> {/* Report Page */}
+          <Route path="/allUsers" element={<AllUsers />} /> {/* Report Page */}
 
         </Routes>
       </Router>

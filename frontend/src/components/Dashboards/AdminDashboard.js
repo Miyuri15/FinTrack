@@ -1,47 +1,110 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiUsers, FiUser, FiBarChart } from "react-icons/fi";
 import { Line, Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import Card from "./Card";
 import Layout from "../Layout";
+import { useAuth } from "../../context/AuthContext";
 
 const AdminDashboard = () => {
-  const username = "Admin";
-  const users = [
-    { id: 1, name: "John Doe", email: "john@example.com", role: "User" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User" },
-    { id: 3, name: "Admin User", email: "admin@example.com", role: "Admin" },
-  ];
+  const { user } = useAuth();
+  const [users, setUsers] = useState([]);
+  const [budgets, setBudgets] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Data for Transactions of the Month Chart
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch all users
+        const usersResponse = await fetch("http://localhost:5000/api/auth/all", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const usersData = await usersResponse.json();
+        setUsers(usersData);
+
+        // Fetch all budgets
+        const budgetsResponse = await fetch("http://localhost:5000/api/budgets/all", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const budgetsData = await budgetsResponse.json();
+        setBudgets(budgetsData);
+
+        // Fetch all transactions
+        const transactionsResponse = await fetch("http://localhost:5000/api/transactions/allTransactions", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const transactionsData = await transactionsResponse.json();
+        setTransactions(transactionsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user.token]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // Process data for charts
+  const processChartData = () => {
+    const monthlyData = {};
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const month = date.toLocaleString("default", { month: "short" });
+
+      if (!monthlyData[month]) {
+        monthlyData[month] = { income: 0, expense: 0 };
+      }
+
+      if (transaction.type === "income") {
+        monthlyData[month].income += transaction.amount;
+      } else if (transaction.type === "expense") {
+        monthlyData[month].expense += transaction.amount;
+      }
+    });
+
+    const labels = Object.keys(monthlyData);
+    const incomeData = labels.map((month) => monthlyData[month].income);
+    const expenseData = labels.map((month) => monthlyData[month].expense);
+
+    return { labels, incomeData, expenseData };
+  };
+
+  const { labels, incomeData, expenseData } = processChartData();
+
   const transactionsData = {
-    labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+    labels: labels,
     datasets: [
       {
-        label: "Transactions",
-        data: [120, 200, 150, 300], // Example data
-        backgroundColor: "#3b82f6", // Blue color
-        borderColor: "#3b82f6",
+        label: "Income",
+        data: incomeData,
+        backgroundColor: "#10b981",
+        borderColor: "#10b981",
+        borderWidth: 1,
+      },
+      {
+        label: "Expenses",
+        data: expenseData,
+        backgroundColor: "#ef4444",
+        borderColor: "#ef4444",
         borderWidth: 1,
       },
     ],
   };
 
-  // Data for Active Users with Budget Chart
   const activeUsersBudgetData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: budgets.map((budget) => budget.month),
     datasets: [
       {
         label: "Active Users",
-        data: [50, 60, 70, 80, 90, 100], // Example data
-        borderColor: "#10b981", // Green color
-        fill: false,
-        tension: 0.4,
-      },
-      {
-        label: "Budget",
-        data: [5000, 4500, 4000, 3500, 3000, 2500], // Example data
-        borderColor: "#f59e0b", // Orange color
+        data: budgets.map((budget) => budget.amount),
+        borderColor: "#3b82f6",
         fill: false,
         tension: 0.4,
       },
@@ -49,25 +112,22 @@ const AdminDashboard = () => {
   };
 
   return (
-    <Layout isAdmin={true} username={username}>
+    <Layout isAdmin={true}>
       <div className="p-4 sm:p-6 lg:p-8">
-        {/* Heading */}
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-6 sm:mb-8">
           Admin Dashboard
         </h1>
 
-        {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card title="Total Users" value={users.length} icon={<FiUsers />} />
-          <Card title="New Signups" value={5} icon={<FiUser />} />
-          <Card title="Reports Generated" value={10} icon={<FiBarChart />} />
+          <Card title="Total Budgets" value={budgets.length} icon={<FiBarChart />} />
+          <Card title="Total Transactions" value={transactions.length} icon={<FiUser />} />
         </div>
 
-        {/* Charts Grid */}
         <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
             <h2 className="text-lg sm:text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3 sm:mb-4">
-              Transactions of the Month
+              Transactions Overview
             </h2>
             <Bar data={transactionsData} />
           </div>
@@ -79,7 +139,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Users Table */}
         <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-x-auto">
           <h2 className="text-lg sm:text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3 sm:mb-4">
             All Users
@@ -94,11 +153,8 @@ const AdminDashboard = () => {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-b dark:border-gray-700 hover:bg-blue-100 dark:hover:bg-gray-700"
-                >
-                  <td className="p-3">{user.name}</td>
+                <tr key={user._id} className="border-b dark:border-gray-700 hover:bg-blue-100 dark:hover:bg-gray-700">
+                  <td className="p-3">{user.username}</td>
                   <td className="p-3">{user.email}</td>
                   <td className="p-3">{user.role}</td>
                 </tr>

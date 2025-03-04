@@ -15,34 +15,35 @@ const UserDashboard = () => {
     goal: 0, // Initialize with 0
     budget: 0, // Initialize with 0
     transactions: 0, // Initialize with 0
-  });  const [loading, setLoading] = useState(true);
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [budgetData, setBudgetData] = useState([]); // Budget data
+  const [transactionData, setTransactionData] = useState([]); // Transaction data
+
   // Fetch data from the backend
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch budget plans count
-        const budgetResponse = await fetch("http://localhost:5000/api/budgets/count",
-          { headers: { Authorization: `Bearer ${user.token}` } }
-        );
+        // Fetch budget data
+        const budgetResponse = await fetch("http://localhost:5000/api/budgets", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
         const budgetData = await budgetResponse.json();
-  
-        // Fetch transactions count
-        const transactionsResponse = await fetch("http://localhost:5000/api/transactions/count",
-          { headers: { Authorization: `Bearer ${user.token}` } }
-        );
+        setBudgetData(budgetData);
+
+        // Fetch transaction data
+        const transactionsResponse = await fetch("http://localhost:5000/api/transactions", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
         const transactionsData = await transactionsResponse.json();
-  
-        // Fetch goals count
-        // const goalsResponse = await fetch("http://localhost:5000/api/goals/count",
-        // { headers: { Authorization: `Bearer ${user.token}` } });
-        // const goalsData = await goalsResponse.json();
-  
+        setTransactionData(transactionsData);
+
         // Update state with fetched data
         setCount({
           ...count,
-          budget: budgetData.count,
-          transactions: transactionsData.count,
-          // goal: goalsData.count,
+          budget: budgetData.length, // Number of budgets
+          transactions: transactionsData.length, // Number of transactions
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -50,17 +51,44 @@ const UserDashboard = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
+
+  // Process transaction data for the chart (income vs. expenses vs. month)
+  const processTransactionData = () => {
+    const monthlyData = {};
+
+    transactionData.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const month = date.toLocaleString("default", { month: "short" }); // e.g., "Jan", "Feb"
+      const type = transaction.type; // "income" or "expense"
+
+      if (!monthlyData[month]) {
+        monthlyData[month] = { income: 0, expense: 0 };
+      }
+
+      if (type === "income") {
+        monthlyData[month].income += transaction.amount;
+      } else if (type === "expense") {
+        monthlyData[month].expense += transaction.amount;
+      }
+    });
+
+    const labels = Object.keys(monthlyData);
+    const incomeData = labels.map((month) => monthlyData[month].income);
+    const expenseData = labels.map((month) => monthlyData[month].expense);
+
+    return { labels, incomeData, expenseData };
+  };
+
   // Data for Budget Flow Chart
   const budgetFlowData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: budgetData.map((budget) => budget.month), // Use budget months as labels
     datasets: [
       {
-        label: "Budget Flow",
-        data: [5000, 4500, 4000, 3500, 3000, 2500], // Example data
+        label: "Budget Amount",
+        data: budgetData.map((budget) => budget.amount), // Use budget amounts as data
         fill: false,
         borderColor: "#3b82f6", // Blue color
         tension: 0.4,
@@ -69,14 +97,22 @@ const UserDashboard = () => {
   };
 
   // Data for Transactions Amount Chart
+  const { labels, incomeData, expenseData } = processTransactionData();
   const transactionsData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: labels,
     datasets: [
       {
-        label: "Transactions Amount",
-        data: [200, 500, 800, 600, 1200, 900], // Example data
+        label: "Income",
+        data: incomeData,
         fill: false,
         borderColor: "#10b981", // Green color
+        tension: 0.4,
+      },
+      {
+        label: "Expenses",
+        data: expenseData,
+        fill: false,
+        borderColor: "#ef4444", // Red color
         tension: 0.4,
       },
     ],
@@ -106,7 +142,7 @@ const UserDashboard = () => {
             value={count.transactions}
             icon={<FiShoppingCart />}
           />
-          <Card title="Goals" value={count.goal} icon={<FiPieChart />} />{" "}
+          <Card title="Goals" value={count.goal} icon={<FiPieChart />} />
         </div>
 
         {/* Charts Grid */}
