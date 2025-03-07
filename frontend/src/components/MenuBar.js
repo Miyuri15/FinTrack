@@ -70,6 +70,15 @@ const MenuBar = () => {
             isActive={isActive("/allUsers")}
           />
         )}
+                {!isAdmin && (
+          <MenuItem
+            to="/goal"
+            icon={<FiClipboard />}
+            text="Goals"
+            isActive={isActive("/goal")}
+          />
+        )}
+
         {/* Logout Button */}
         <li>
           <button

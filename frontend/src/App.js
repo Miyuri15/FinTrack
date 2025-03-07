@@ -16,6 +16,7 @@ import UserReports from './components/Reports/UserReports';
 import AdminReports from './components/Reports/AdminReports';
 import Analytics from './components/Analytics/Analytics';
 import AllUsers from './components/AllUsers/AllUsers';
+import Goals from './components/Goals/Goals';
 
 const App = () => {
   const isAdmin = true;
@@ -39,8 +40,10 @@ const App = () => {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/userReports" element={<UserReports />} /> {/* Report Page */}
           <Route path="/adminReports" element={<AdminReports />} /> {/* Report Page */}
-          <Route path="/analytics" element={<Analytics />} /> {/* Report Page */}
-          <Route path="/allUsers" element={<AllUsers />} /> {/* Report Page */}
+          <Route path="/analytics" element={<Analytics />} /> {/* Analytics Page */}
+          <Route path="/allUsers" element={<AllUsers />} /> {/* All users Page */}
+          <Route path="/goal" element={<Goals />} /> {/* Goal Page */}
+          <Route path="/currency" element={<Goals />} /> {/* Goal Page */}
 
         </Routes>
       </Router>

@@ -7,6 +7,8 @@ const authRoutes = require("./routes/userRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const goalRoutes = require("./routes/goalRoutes");
+const CurrencyRoutes = require("./routes/CurrencyRoutes");
 
 dotenv.config();
 connectDB();
@@ -19,6 +21,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/goals", goalRoutes);
+app.use("/api/currencies",CurrencyRoutes)
 
 
 // Error handling middleware
