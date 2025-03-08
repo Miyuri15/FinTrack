@@ -80,7 +80,7 @@ function Login() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-transparent opacity-70"></div>
         <div className="absolute top-9 left-9 cursor-pointer w-90 h-90">
-          <img src="/img/FintrackLogo.png" alt="Logo" className="w-40 h-34 mx-5" />
+          <img src="/img/FintrackLogo.png" alt="Logo" className="w-80 h-34 mx-5" />
         </div>
         <div className="flex flex-col items-start justify-end p-10 bg-blue-900 bg-opacity-30 text-white h-full w-full">
           <h1 className="text-3xl font-bold mb-5">Login</h1>

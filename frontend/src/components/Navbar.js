@@ -14,8 +14,8 @@ const Navbar = () => {
       <img
             src="/img/FintrackLogo.png"
             alt="logo"
-            width={70}
-            height={40}
+            width={150}
+            height={50}
             className="mb-5 mt-4 "
           />
       </div>
@@ -38,7 +38,7 @@ const Navbar = () => {
 
         <div className="relative flex items-center space-x-2">
           <FaUser />
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className="text-lg text-gray-700 dark:text-gray-300 font-bold">
             {user ? user.username : "Guest"} {/* Display the username from AuthContext */}
           </span>
         </div>

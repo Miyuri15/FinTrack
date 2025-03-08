@@ -37,7 +37,10 @@ export default function Goals() {
   return (
     <Layout>
       <div>
+        <div className="font-bold text-3xl mb-6">
         <h1>FinTrack - Goals and Savings</h1>
+        </div>
+
         <GoalForm onGoalAdded={handleGoalAdded} />
         <GoalList goals={goals} fetchGoals={fetchGoals} />
       </div>

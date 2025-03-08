@@ -17,13 +17,17 @@ export default function AdminTransactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/transactions/all", {
+        const response = await fetch("http://localhost:5000/api/transactions/allTransactions", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
         if (!response.ok) {
-          throw new Error("Failed to fetch transactions");
+          if (response.status === 403) {
+            throw new Error("Access denied. Admins only.");
+          } else {
+            throw new Error("Failed to fetch transactions");
+          }
         }
         const data = await response.json();
         setTransactions(data);
@@ -37,6 +41,7 @@ export default function AdminTransactions() {
     fetchTransactions();
   }, []);
 
+  
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }

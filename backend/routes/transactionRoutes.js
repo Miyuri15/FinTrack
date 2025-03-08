@@ -9,6 +9,7 @@ router.post("/", authMiddleware, async (req, res) => {
   const {
     type,
     amount,
+    currency,
     category,
     tags,
     description,
@@ -17,7 +18,7 @@ router.post("/", authMiddleware, async (req, res) => {
   } = req.body;
 
   // Validate required fields
-  if (!type || !amount || !description) {
+  if (!type || !amount || !description || !currency) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -26,6 +27,7 @@ router.post("/", authMiddleware, async (req, res) => {
       user: req.user.id,
       type,
       amount,
+      currency, 
       category,
       tags,
       description,
@@ -175,6 +177,7 @@ router.get('/all', authMiddleware, async (req, res) => {
 
 // Get all transactions (Admin Only)
 router.get('/allTransactions', authMiddleware, async (req, res) => {
+  console.log("User making request:", req.user); // Log the user object
   try {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied. Admins only.' });
@@ -183,9 +186,11 @@ router.get('/allTransactions', authMiddleware, async (req, res) => {
     const transactions = await Transaction.find({}).populate('user', 'username email');
     res.json(transactions);
   } catch (error) {
+    console.error('Error fetching all transactions:', error);
     res.status(500).json({ error: 'Error fetching transactions' });
   }
 });
+
 
 // Update a transaction
 router.put("/:id", authMiddleware, async (req, res) => {

@@ -84,10 +84,13 @@ const GoalList = ({ goals, fetchGoals }) => {
 
   return (
     <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Your Goals</h2>
+      <div className="max-w-7xl mx-auto">
         <SavingsAllocation goals={goals} onAllocationComplete={fetchGoals} />
-        <div className="space-y-6">
+        
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Your Goals</h2>
+
+        {/* Grid layout for goal cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {goals.map((goal) => {
             const progress = calculateProgress(goal.savedAmount, goal.targetAmount);
             const progressColor = getProgressColor(progress);

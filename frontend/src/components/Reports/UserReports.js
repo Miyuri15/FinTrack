@@ -107,10 +107,10 @@ export default function UserReports({ username }) {
       <div className={`p-4 ${darkMode ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Report Portal</h1>
+          <h1 className="text-3xl font-bold">Report Portal</h1>
           <button
             onClick={generateReport}
-            className="p-4 bg-blue-500 text-white rounded hover:bg-blue-600 text-xl font-semibold"
+            className="p-4 bg-blue-800 text-white  hover:bg-blue-600 text-xl font-semibold rounded-lg"
           >
             Generate Report
           </button>

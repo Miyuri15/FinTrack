@@ -78,15 +78,25 @@ const TransactionsPage = ({ username }) => {
     }
   };
 
+  // Function to format amount with currency symbol
+  const formatAmount = (amount, currency) => {
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency, // Use the currency code from the transaction
+      minimumFractionDigits: 2,
+    });
+    return formatter.format(amount);
+  };
+
   const inputClass = "w-full px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200";
 
   return (
     <div className="container mx-auto px-4 py-8">
-    <div className="flex space-x-4 cursor-pointer" onClick={() => navigate("/userTransactions")}>            
-            <FaLongArrowAltLeft className="w-10 h-10"/>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-        Transaction History
-      </h1>
+      <div className="flex space-x-4 cursor-pointer" onClick={() => navigate("/userTransactions")}>            
+        <FaLongArrowAltLeft className="w-10 h-10"/>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+          Transaction History
+        </h1>
       </div>
       {loading ? (
         <div className="flex justify-center items-center py-8">
@@ -110,7 +120,7 @@ const TransactionsPage = ({ username }) => {
               <div className="flex justify-between items-center">
                 <div>
                   <p className={`text-lg font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {transaction.type === 'income' ? '+' : '-'} ${transaction.amount}
+                    {transaction.type === 'income' ? '+' : '-'} {formatAmount(transaction.amount, transaction.currency)}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {transaction.category}

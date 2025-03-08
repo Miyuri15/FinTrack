@@ -12,38 +12,59 @@ const UserDashboard = () => {
   const [count, setCount] = useState({
     name: "John Doe",
     email: "john@example.com",
-    goal: 0, // Initialize with 0
+    goals: 0, // Initialize with 0
     budget: 0, // Initialize with 0
     transactions: 0, // Initialize with 0
   });
 
   const [loading, setLoading] = useState(true);
   const [budgetData, setBudgetData] = useState([]); // Budget data
-  const [transactionData, setTransactionData] = useState([]); // Transaction data
+  const [transactionData, setTransactionData] = useState([]);
+  const [goalData, setGoalData] = useState([]);
+  // Transaction data
 
   // Fetch data from the backend
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch budget data
-        const budgetResponse = await fetch("http://localhost:5000/api/budgets", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const budgetResponse = await fetch(
+          "http://localhost:5000/api/budgets",
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        if (!budgetResponse.ok) throw new Error("Failed to fetch budget data");
         const budgetData = await budgetResponse.json();
         setBudgetData(budgetData);
-
+  
         // Fetch transaction data
-        const transactionsResponse = await fetch("http://localhost:5000/api/transactions", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const transactionsResponse = await fetch(
+          "http://localhost:5000/api/transactions",
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        if (!transactionsResponse.ok)
+          throw new Error("Failed to fetch transaction data");
         const transactionsData = await transactionsResponse.json();
         setTransactionData(transactionsData);
-
+  
+        // Fetch goal data
+        const goalResponse = await fetch("http://localhost:5000/api/goals", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        if (!goalResponse.ok)
+          throw new Error("Failed to fetch goal data");
+        const goalsData = await goalResponse.json();
+        setGoalData(goalsData);
+  
         // Update state with fetched data
         setCount({
           ...count,
           budget: budgetData.length, // Number of budgets
           transactions: transactionsData.length, // Number of transactions
+          goals: goalsData.length, // Number of goals
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -51,9 +72,10 @@ const UserDashboard = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
-  }, []);
+  }, [user.token]);
+
 
   // Process transaction data for the chart (income vs. expenses vs. month)
   const processTransactionData = () => {
@@ -142,7 +164,7 @@ const UserDashboard = () => {
             value={count.transactions}
             icon={<FiShoppingCart />}
           />
-          <Card title="Goals" value={count.goal} icon={<FiPieChart />} />
+          <Card title="Goals" value={count.goals} icon={<FiPieChart />} />
         </div>
 
         {/* Charts Grid */}
