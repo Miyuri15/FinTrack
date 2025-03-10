@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../Layout";
 import { useAuth } from "../../context/AuthContext";
-import Notifications from "../Notifications";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const UserTransactions = ({ username }) => {
   const { user } = useAuth();
@@ -11,6 +11,7 @@ const UserTransactions = ({ username }) => {
   const [currencies, setCurrencies] = useState([]); // State to store currencies
   const [exchangeRates, setExchangeRates] = useState({}); // State to store exchange rates
   const [baseCurrency, setBaseCurrency] = useState("USD"); // State for base currency selection
+  const [categories, setCategories] = useState([]); // State to store categories
   const [newTransaction, setNewTransaction] = useState({
     type: "expense",
     amount: 0,
@@ -52,69 +53,92 @@ const UserTransactions = ({ username }) => {
     }
   }, [baseCurrency, user.token]);
 
+  // Fetch categories from the backend
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/categories", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+      .then((response) => setCategories(response.data))
+      .catch((error) => console.error("Error fetching categories:", error));
+  }, [user.token]);
+
   const handleAddTransaction = async (e) => {
     e.preventDefault();
 
     if (!user || !user.token) {
-        setError("User is not authenticated. Please log in.");
-        return;
+      setError("User is not authenticated. Please log in.");
+      return;
     }
 
     if (
-        !newTransaction.amount ||
-        !newTransaction.category ||
-        !newTransaction.description ||
-        !newTransaction.currency
+      !newTransaction.amount ||
+      !newTransaction.category ||
+      !newTransaction.description ||
+      !newTransaction.currency
     ) {
-        setError("Please fill in all required fields");
-        return;
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    // Check if the amount exceeds the category limit
+    const selectedCategory = categories.find((cat) => cat.name === newTransaction.category);
+    if (selectedCategory && newTransaction.amount > selectedCategory.limit) {
+      Swal.fire({
+        icon: "error",
+        title: "Limit Exceeded",
+        text: `The amount exceeds the limit for ${selectedCategory.name} (Limit: ${selectedCategory.limit})`,
+        timer: 2000, // 2 seconds
+        timerProgressBar: true,
+      });
+      return;
     }
 
     try {
-        const payload = {
-            ...newTransaction,
-            amount: parseFloat(newTransaction.amount),
-            recurrencePattern: newTransaction.isRecurring
-                ? {
-                    frequency: newTransaction.recurrencePattern.frequency,
-                    endDate: newTransaction.recurrencePattern.endDate,
-                }
-                : undefined,
-        };
-
-        const response = await axios.post(
-            "http://localhost:5000/api/transactions",
-            payload,
-            {
-                headers: { Authorization: `Bearer ${user.token}` },
+      const payload = {
+        ...newTransaction,
+        amount: parseFloat(newTransaction.amount),
+        recurrencePattern: newTransaction.isRecurring
+          ? {
+              frequency: newTransaction.recurrencePattern.frequency,
+              endDate: newTransaction.recurrencePattern.endDate,
             }
-        );
+          : undefined,
+      };
 
-        setNewTransaction({
-            type: "expense",
-            amount: 0,
-            currency: "USD",
-            category: "",
-            tags: [],
-            description: "",
-            isRecurring: false,
-            recurrencePattern: {
-                frequency: "monthly",
-                endDate: "",
-                nextOccurrence: "",
-            },
-        });
-        setError("");
-    } catch (err) {
-        if (err.response && err.response.data.error) {
-            setError(err.response.data.error);
-        } else {
-            setError("Failed to add transaction");
+      const response = await axios.post(
+        "http://localhost:5000/api/transactions",
+        payload,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
         }
-        console.error("Error:", err);
-    }
-};
+      );
 
+      setNewTransaction({
+        type: "expense",
+        amount: 0,
+        currency: "USD",
+        category: "",
+        tags: [],
+        description: "",
+        isRecurring: false,
+        recurrencePattern: {
+          frequency: "monthly",
+          endDate: "",
+          nextOccurrence: "",
+        },
+      });
+      setError("");
+      Swal.fire("Success!", "Transaction added successfully!", "success");
+    } catch (err) {
+      if (err.response && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to add transaction");
+      }
+      console.error("Error:", err);
+    }
+  };
 
   const inputClass =
     "w-full px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200";
@@ -133,7 +157,6 @@ const UserTransactions = ({ username }) => {
             View Transactions
           </button>
         </div>
-
 
         {/* Exchange Rate Display Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
@@ -214,15 +237,20 @@ const UserTransactions = ({ username }) => {
                   </option>
                 ))}
               </select>
-              <input
-                type="text"
-                placeholder="Category"
+              <select
                 value={newTransaction.category}
                 onChange={(e) =>
                   setNewTransaction({ ...newTransaction, category: e.target.value })
                 }
                 className={inputClass}
-              />
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="grid grid-cols-1 gap-4">
               <input

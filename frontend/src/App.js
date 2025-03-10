@@ -17,6 +17,7 @@ import AdminReports from './components/Reports/AdminReports';
 import Analytics from './components/Analytics/Analytics';
 import AllUsers from './components/AllUsers/AllUsers';
 import Goals from './components/Goals/Goals';
+import Settings from './components/Settings/Settings';
 
 const App = () => {
   const isAdmin = true;
@@ -44,6 +45,7 @@ const App = () => {
           <Route path="/allUsers" element={<AllUsers />} /> {/* All users Page */}
           <Route path="/goal" element={<Goals />} /> {/* Goal Page */}
           <Route path="/currency" element={<Goals />} /> {/* Goal Page */}
+          <Route path="/settings" element={<Settings />} /> {/* settings Page */}
 
         </Routes>
       </Router>

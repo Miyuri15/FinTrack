@@ -8,6 +8,7 @@ import {
   FiUsers,
   FiFileText,
   FiLogOut,
+  FiSettings,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 
@@ -70,7 +71,15 @@ const MenuBar = () => {
             isActive={isActive("/allUsers")}
           />
         )}
-                {!isAdmin && (
+        {isAdmin && (
+          <MenuItem
+            to="/settings"
+            icon={<FiSettings />}
+            text="Settings"
+            isActive={isActive("/settings")}
+          />
+        )}
+        {!isAdmin && (
           <MenuItem
             to="/goal"
             icon={<FiClipboard />}

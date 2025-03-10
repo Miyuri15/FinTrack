@@ -9,7 +9,7 @@ const transactionRoutes = require("./routes/transactionRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const goalRoutes = require("./routes/goalRoutes");
 const currencyRoutes = require("./routes/currencyRoutes");
-
+const categoryRoutes = require("./routes/categoryRoutes");
 // Load environment variables
 dotenv.config();
 
@@ -27,6 +27,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/currencies", currencyRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
