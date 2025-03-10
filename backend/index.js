@@ -10,20 +10,23 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const goalRoutes = require("./routes/goalRoutes");
 const currencyRoutes = require("./routes/currencyRoutes");
 
+// Load environment variables
 dotenv.config();
-connectDB();
 
+// Initialize Express app
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/goals", goalRoutes);
-app.use("/api/currencies",currencyRoutes)
-
+app.use("/api/currencies", currencyRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -31,5 +34,12 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: "Something went wrong!" });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Connect to the database and start the server only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+    connectDB(); // Connect to the database
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+// Export the app for testing
+module.exports = app;

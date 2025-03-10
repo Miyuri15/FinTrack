@@ -56,62 +56,65 @@ const UserTransactions = ({ username }) => {
     e.preventDefault();
 
     if (!user || !user.token) {
-      setError("User is not authenticated. Please log in.");
-      return;
+        setError("User is not authenticated. Please log in.");
+        return;
     }
 
     if (
-      !newTransaction.amount ||
-      !newTransaction.category ||
-      !newTransaction.description ||
-      !newTransaction.currency
+        !newTransaction.amount ||
+        !newTransaction.category ||
+        !newTransaction.description ||
+        !newTransaction.currency
     ) {
-      setError("Please fill in all required fields");
-      return;
+        setError("Please fill in all required fields");
+        return;
     }
 
     try {
-      const payload = {
-        ...newTransaction,
-        amount: parseFloat(newTransaction.amount), // Ensure amount is a number
-        recurrencePattern: newTransaction.isRecurring
-          ? newTransaction.recurrencePattern
-          : undefined,
-      };
+        const payload = {
+            ...newTransaction,
+            amount: parseFloat(newTransaction.amount),
+            recurrencePattern: newTransaction.isRecurring
+                ? {
+                    frequency: newTransaction.recurrencePattern.frequency,
+                    endDate: newTransaction.recurrencePattern.endDate,
+                }
+                : undefined,
+        };
 
-      const response = await axios.post(
-        "http://localhost:5000/api/transactions",
-        payload,
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      );
+        const response = await axios.post(
+            "http://localhost:5000/api/transactions",
+            payload,
+            {
+                headers: { Authorization: `Bearer ${user.token}` },
+            }
+        );
 
-      // Reset form after successful submission
-      setNewTransaction({
-        type: "expense",
-        amount: 0,
-        currency: "USD",
-        category: "",
-        tags: [],
-        description: "",
-        isRecurring: false,
-        recurrencePattern: {
-          frequency: "monthly",
-          endDate: "",
-          nextOccurrence: "",
-        },
-      });
-      setError("");
+        setNewTransaction({
+            type: "expense",
+            amount: 0,
+            currency: "USD",
+            category: "",
+            tags: [],
+            description: "",
+            isRecurring: false,
+            recurrencePattern: {
+                frequency: "monthly",
+                endDate: "",
+                nextOccurrence: "",
+            },
+        });
+        setError("");
     } catch (err) {
-      if (err.response && err.response.data.error) {
-        setError(err.response.data.error);
-      } else {
-        setError("Failed to add transaction");
-      }
-      console.error("Error:", err);
+        if (err.response && err.response.data.error) {
+            setError(err.response.data.error);
+        } else {
+            setError("Failed to add transaction");
+        }
+        console.error("Error:", err);
     }
-  };
+};
+
 
   const inputClass =
     "w-full px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200";
@@ -131,7 +134,6 @@ const UserTransactions = ({ username }) => {
           </button>
         </div>
 
-        <Notifications />
 
         {/* Exchange Rate Display Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">

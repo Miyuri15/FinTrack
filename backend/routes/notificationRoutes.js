@@ -33,4 +33,14 @@ router.put('/:id/read', authMiddleware, async (req, res) => {
     }
 });
 
+// Delete a notification
+router.delete('/:id', authMiddleware, async (req, res) => {
+    try {
+        await Notification.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+        res.json({ message: 'Notification deleted' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error deleting notification' });
+    }
+});
+
 module.exports = router;

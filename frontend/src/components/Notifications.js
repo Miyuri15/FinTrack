@@ -23,7 +23,6 @@ const Notifications = () => {
       };
 
       fetchNotifications();
-      // Auto-refresh notifications every 10 seconds
       const interval = setInterval(fetchNotifications, 10000);
       return () => clearInterval(interval);
     }
@@ -48,6 +47,17 @@ const Notifications = () => {
     }
   };
 
+  const deleteNotification = async (notificationId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/notifications/${notificationId}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setNotifications(notifications.filter((n) => n._id !== notificationId));
+    } catch (error) {
+      console.error('Failed to delete notification:', error);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
@@ -64,7 +74,7 @@ const Notifications = () => {
       ) : notifications.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400">No notifications</p>
       ) : (
-        <div className="space-y-4 max-h-64 overflow-y-auto scrollbar-hide"> {/* Added max height and scroll */}
+        <div className="space-y-4 max-h-64 overflow-y-auto scrollbar-hide">
           {notifications.map((notification) => (
             <div
               key={notification._id}
@@ -80,14 +90,22 @@ const Notifications = () => {
                   {new Date(notification.createdAt).toLocaleString()}
                 </p>
               </div>
-              {!notification.read && (
+              <div className="flex space-x-2">
+                {!notification.read && (
+                  <button
+                    onClick={() => markAsRead(notification._id)}
+                    className="text-blue-600 dark:text-blue-400 text-xs"
+                  >
+                    Mark as Read
+                  </button>
+                )}
                 <button
-                  onClick={() => markAsRead(notification._id)}
-                  className="text-blue-600 dark:text-blue-400 text-xs"
+                  onClick={() => deleteNotification(notification._id)}
+                  className="text-red-600 dark:text-red-400 text-xs"
                 >
-                  Mark as Read
+                  Delete
                 </button>
-              )}
+              </div>
             </div>
           ))}
         </div>

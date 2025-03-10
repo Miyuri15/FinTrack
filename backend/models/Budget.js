@@ -9,7 +9,7 @@ const SpendingSchema = new mongoose.Schema({
 const BudgetSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   month: { type: String }, // Month for the budget
-  budgetName: { type: String }, // Name for the budget
+  budgetName: { type: String, required:true }, // Name for the budget
   amount: { type: Number, required: true }, // Total budget amount
   startDate: { type: Date, default: Date.now }, // Start date of the budget
   endDate: { type: Date }, // End date of the budget

@@ -2,6 +2,9 @@
 const express = require("express");
 const Goal = require("../models/Goal");
 const authMiddleware = require('../middleware/authMiddleware');
+const Notification = require("../models/Notification");
+const { sendNotification } = require("../utils/notificationUtils");
+const User = require("../models/User");
 const router = express.Router();
 
 // Create a new goal
@@ -79,4 +82,41 @@ router.patch("/:id", authMiddleware, async (req, res) => {
   }
 });
 
+router.get('/testcrongoal', async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const sevenDaysFromNow = new Date(currentDate.setDate(currentDate.getDate() + 7));
+
+    // Check for upcoming goals
+    const goals = await Goal.find({
+      deadline: { $lte: sevenDaysFromNow }, // Goals due within the next 7 days
+    });
+
+    for (const goal of goals) {
+      const user = await User.findById(goal.userId);
+      if (!user) continue;
+
+      const daysLeft = Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+      if (daysLeft <= 7) { // Notify if goal deadline is within 7 days
+        await Notification.create({
+          user: user._id,
+          message: `Your financial goal "${goal.title}" is due in ${daysLeft} days.`,
+          type: 'goal',
+        });
+
+        // Send email notification
+        await sendNotification(
+          user.email,
+          `Reminder: Your financial goal "${goal.title}" is due in ${daysLeft} days.`,
+          user._id
+        );
+      }
+    }
+
+    res.json({ message: 'Cron job logic executed successfully.' });
+  } catch (error) {
+    console.error('Error testing cron job:', error);
+    res.status(500).json({ error: 'Error testing cron job' });
+  }
+});
 module.exports = router;
