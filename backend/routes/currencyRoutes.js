@@ -20,6 +20,10 @@ router.get("/", authMiddleware, async (req, res) => {
 
 // Add a new currency
 router.post("/add", authMiddleware, async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Access denied. Admins only." });
+  }
+
   const { code, name, exchangeRate } = req.body;
 
   try {
