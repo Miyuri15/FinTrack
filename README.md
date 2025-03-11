@@ -105,12 +105,12 @@ Since no automated security test script was created, this process was performed 
 Run Performance Tests
 Performance testing was conducted to evaluate the API’s ability to handle multiple requests simultaneously.
 We used Artillery.io for load testing.
-```bash
+bash
 npm run test:performance
 npx artillery run tests/performance/load-test.yml
-```
 
----
+
+
 
 API Documentation
 
