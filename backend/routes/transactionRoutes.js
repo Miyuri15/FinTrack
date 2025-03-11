@@ -10,6 +10,10 @@ const Goal = require("../models/Goal");
 const router = express.Router();
 
 router.post("/", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   const {
       type,
       amount,
@@ -188,6 +192,10 @@ router.get('/allTransactions', authMiddleware, async (req, res) => {
 
 // Update a transaction
 router.put("/:id", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
       const { isRecurring, recurrencePattern, ...updateData } = req.body;
       let nextOccurrence = null;
@@ -216,6 +224,10 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
 // Delete a transaction
 router.delete("/:id", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
     await Transaction.findByIdAndDelete(req.params.id);
     res.json({ message: "Transaction deleted" });
@@ -339,128 +351,133 @@ router.get('/testcronbill', async (req, res) => {
 
 router.get('/test-cron-all', async (req, res) => {
   try {
-    const currentDate = new Date();
-    const twoDaysFromNow = new Date(currentDate.setDate(currentDate.getDate() + 2));
-    const sevenDaysFromNow = new Date(currentDate.setDate(currentDate.getDate() + 7));
+      const currentDate = new Date();
+      const twoDaysFromNow = new Date(currentDate.setDate(currentDate.getDate() + 2));
+      const sevenDaysFromNow = new Date(currentDate.setDate(currentDate.getDate() + 7));
 
-    // Fetch all users
-    const users = await User.find({});
+      // Fetch all users
+      const users = await User.find({});
 
-    for (const user of users) {
-      const userId = user._id;
+      for (const user of users) {
+          const userId = user._id;
 
-      // Task 1: Upcoming or Missed Recurring Transactions
-      const recurringTransactions = await Transaction.find({
-        user: userId,
-        isRecurring: true,
-        'recurrencePattern.nextOccurrence': { $lte: twoDaysFromNow },
-      });
-
-      for (const transaction of recurringTransactions) {
-        const { nextOccurrence, endDate, frequency } = transaction.recurrencePattern;
-
-        if (nextOccurrence < new Date()) {
-          await Notification.create({
-            user: userId,
-            message: `You missed a recurring transaction: ${transaction.description}`,
-            type: 'transaction',
+          // Task 1: Upcoming or Missed Recurring Transactions
+          const recurringTransactions = await Transaction.find({
+              user: userId,
+              isRecurring: true,
+              'recurrencePattern.nextOccurrence': { $lte: twoDaysFromNow },
           });
-        } else {
-          await Notification.create({
-            user: userId,
-            message: `Upcoming recurring transaction: ${transaction.description} on ${nextOccurrence.toDateString()}`,
-            type: 'transaction',
-          });
-        }
 
-        let newNextOccurrence = calculateNextOccurrence(nextOccurrence, frequency);
+          for (const transaction of recurringTransactions) {
+              const { nextOccurrence, endDate, frequency } = transaction.recurrencePattern;
 
-        if (endDate && newNextOccurrence > endDate) {
-          transaction.isRecurring = false;
-        } else {
-          transaction.recurrencePattern.nextOccurrence = newNextOccurrence;
-        }
+              if (nextOccurrence < new Date()) {
+                  await Notification.create({
+                      user: userId,
+                      message: `You missed a recurring transaction: ${transaction.description}`,
+                      type: 'transaction', // Provide the type
+                  });
+              } else {
+                  await Notification.create({
+                      user: userId,
+                      message: `Upcoming recurring transaction: ${transaction.description} on ${nextOccurrence.toDateString()}`,
+                      type: 'transaction', // Provide the type
+                  });
+              }
 
-        await transaction.save();
+              let newNextOccurrence = calculateNextOccurrence(nextOccurrence, frequency);
 
-        // Send email notification
-        await sendNotification(
-          user.email,
-          `Upcoming recurring transaction: ${transaction.description} on ${newNextOccurrence.toDateString()}`,
-          userId
-        );
+              if (endDate && newNextOccurrence > endDate) {
+                  transaction.isRecurring = false;
+              } else {
+                  transaction.recurrencePattern.nextOccurrence = newNextOccurrence;
+              }
+
+              await transaction.save();
+
+              // Send email notification
+              await sendNotification(
+                  user.email,
+                  `Upcoming recurring transaction: ${transaction.description} on ${newNextOccurrence.toDateString()}`,
+                  userId,
+                  'transaction' // Provide the type
+              );
+          }
+
+          // Task 2: Notify Users About Unusual Spending Patterns
+          const budgets = await Budget.find({ user: userId });
+
+          for (const budget of budgets) {
+              const totalSpent = budget.spendings.reduce((sum, spending) => sum + spending.spent, 0);
+              if (totalSpent > budget.amount * 0.8) { // Notify if 80% of the budget is spent
+                  await Notification.create({
+                      user: userId,
+                      message: `You have spent ${((totalSpent / budget.amount) * 100).toFixed(2)}% of your ${budget.budgetName} budget.`,
+                      type: 'budget', // Provide the type
+                  });
+
+                  // Send email notification
+                  await sendNotification(
+                      user.email,
+                      `Warning: You have spent ${((totalSpent / budget.amount) * 100).toFixed(2)}% of your ${budget.budgetName} budget.`,
+                      userId,
+                      'budget' // Provide the type
+                  );
+              }
+          }
+
+          // Task 3: Send Reminders for Bill Payments
+          const bills = await Transaction.find({ user: userId, type: 'expense', category: 'bill' });
+
+          for (const bill of bills) {
+              const daysLeft = Math.ceil((new Date(bill.date) - new Date()) / (1000 * 60 * 60 * 24));
+              if (daysLeft <= 3) { // Notify if bill is due in 3 days
+                  await Notification.create({
+                      user: userId,
+                      message: `Your bill "${bill.description}" is due in ${daysLeft} days.`,
+                      type: 'bill', // Provide the type
+                  });
+
+                  // Send email notification
+                  await sendNotification(
+                      user.email,
+                      `Reminder: Your bill "${bill.description}" is due in ${daysLeft} days.`,
+                      userId,
+                      'bill' // Provide the type
+                  );
+              }
+          }
+
+          // Task 4: Send Reminders for Upcoming Financial Goals
+          const goals = await Goal.find({ userId });
+
+          for (const goal of goals) {
+              const daysLeft = Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+              if (daysLeft <= 7) { // Notify if goal deadline is within 7 days
+                  await Notification.create({
+                      user: userId,
+                      message: `Your financial goal "${goal.title}" is due in ${daysLeft} days.`,
+                      type: 'goal', // Provide the type
+                  });
+
+                  // Send email notification
+                  await sendNotification(
+                      user.email,
+                      `Reminder: Your financial goal "${goal.title}" is due in ${daysLeft} days.`,
+                      userId,
+                      'goal' // Provide the type
+                  );
+              }
+          }
       }
 
-      // Task 2: Notify Users About Unusual Spending Patterns
-      const budgets = await Budget.find({ user: userId });
-
-      for (const budget of budgets) {
-        const totalSpent = budget.spendings.reduce((sum, spending) => sum + spending.spent, 0);
-        if (totalSpent > budget.amount * 0.8) { // Notify if 80% of the budget is spent
-          await Notification.create({
-            user: userId,
-            message: `You have spent ${((totalSpent / budget.amount) * 100).toFixed(2)}% of your ${budget.budgetName} budget.`,
-            type: 'budget',
-          });
-
-          // Send email notification
-          await sendNotification(
-            user.email,
-            `Warning: You have spent ${((totalSpent / budget.amount) * 100).toFixed(2)}% of your ${budget.budgetName} budget.`,
-            userId
-          );
-        }
-      }
-
-      // Task 3: Send Reminders for Bill Payments
-      const bills = await Transaction.find({ user: userId, type: 'expense', category: 'bill' });
-
-      for (const bill of bills) {
-        const daysLeft = Math.ceil((new Date(bill.date) - new Date()) / (1000 * 60 * 60 * 24));
-        if (daysLeft <= 3) { // Notify if bill is due in 3 days
-          await Notification.create({
-            user: userId,
-            message: `Your bill "${bill.description}" is due in ${daysLeft} days.`,
-            type: 'bill',
-          });
-
-          // Send email notification
-          await sendNotification(
-            user.email,
-            `Reminder: Your bill "${bill.description}" is due in ${daysLeft} days.`,
-            userId
-          );
-        }
-      }
-
-      // Task 4: Send Reminders for Upcoming Financial Goals
-      const goals = await Goal.find({ userId });
-
-      for (const goal of goals) {
-        const daysLeft = Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24));
-        if (daysLeft <= 7) { // Notify if goal deadline is within 7 days
-          await Notification.create({
-            user: userId,
-            message: `Your financial goal "${goal.title}" is due in ${daysLeft} days.`,
-            type: 'goal',
-          });
-
-          // Send email notification
-          await sendNotification(
-            user.email,
-            `Reminder: Your financial goal "${goal.title}" is due in ${daysLeft} days.`,
-            userId
-          );
-        }
-      }
-    }
-
-    res.json({ message: 'Cron job logic executed successfully.' });
+      res.json({ message: 'Cron job logic executed successfully.' });
   } catch (error) {
-    console.error('Error testing cron job:', error);
-    res.status(500).json({ error: 'Error testing cron job' });
+      console.error('Error testing cron job:', error);
+      res.status(500).json({ error: 'Error testing cron job' });
   }
 });
+
 
 // Helper function to calculate the next occurrence date
 function calculateNextOccurrence(currentDate, frequency) {

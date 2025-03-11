@@ -1,0 +1,22 @@
+config:
+  target: "http://localhost:5000" # Replace with your API URL
+  phases:
+    - duration: 60 # Test duration in seconds
+      arrivalRate: 10 # Number of users per second
+
+scenarios:
+  - flow:
+      - get:
+          url: "/api/budgets"
+          headers:
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2VjZDk0NTFjZTFjZTBlMTJlYWQwZSIsInJvbGUiOiJ1c2VyIiwidXNlcm5hbWUiOiJNaXl1cmlMb2t1aGV3YWdlIiwiaWF0IjoxNzQxNjgxNDUwLCJleHAiOjE3NDE2ODUwNTB9.ISoRxId--mxpmYjGNXYeAQ0FsXrGXwcT9TNWn1F4p6o" # Replace with a valid token
+      - post:
+          url: "/api/transactions"
+          json:
+            type: "expense"
+            amount: 100
+            currency: "USD"
+            category: "Food"
+            description: "Groceries"
+          headers:
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2VjZDk0NTFjZTFjZTBlMTJlYWQwZSIsInJvbGUiOiJ1c2VyIiwidXNlcm5hbWUiOiJNaXl1cmlMb2t1aGV3YWdlIiwiaWF0IjoxNzQxNjgxNDUwLCJleHAiOjE3NDE2ODUwNTB9.ISoRxId--mxpmYjGNXYeAQ0FsXrGXwcT9TNWn1F4p6o" # Replace with a valid token

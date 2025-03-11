@@ -67,6 +67,7 @@ const TransactionsPage = ({ username }) => {
   };
 
   const handleDeleteTransaction = async (id) => {
+    console.log("Deleting transaction with ID:", id); // Add this line
     try {
       await axios.delete(`http://localhost:5000/api/transactions/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -77,7 +78,7 @@ const TransactionsPage = ({ username }) => {
       console.error("Delete Error:", err);
     }
   };
-
+  
   // Function to format amount with currency symbol
   const formatAmount = (amount, currency) => {
     const formatter = new Intl.NumberFormat("en-US", {

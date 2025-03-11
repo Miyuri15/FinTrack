@@ -9,6 +9,10 @@ const router = express.Router();
 
 // Create a new goal
 router.post("/", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   const { title, targetAmount, deadline } = req.body;
   try {
     const goal = new Goal({
@@ -37,6 +41,10 @@ router.get("/", authMiddleware, async (req, res) => {
 
 // Delete a goal
 router.delete("/:id", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
     const goal = await Goal.findByIdAndDelete(req.params.id);
     if (!goal) return res.status(404).json({ error: "Goal not found" });
@@ -48,6 +56,10 @@ router.delete("/:id", authMiddleware, async (req, res) => {
 
 
 router.post("/allocate", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
     const { userId, allocation } = req.body;
     try {
       // Update each goal's savedAmount
@@ -65,6 +77,10 @@ router.post("/allocate", authMiddleware, async (req, res) => {
 
 // Update a goal
 router.patch("/:id", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   const { title, targetAmount, deadline, savedAmount } = req.body;
   try {
     const goal = await Goal.findById(req.params.id);

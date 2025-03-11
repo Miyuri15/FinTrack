@@ -8,6 +8,10 @@ const Recommendation = require("../models/Recommendation");
 
 // Create a new budget
 router.post('/', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   const { month, budgetName, amount, endDate, spendings } = req.body;
   try {
     const budget = new Budget({
@@ -32,6 +36,9 @@ router.post('/', authMiddleware, async (req, res) => {
 // Get budgets for logged-in user
 router.get('/', authMiddleware, async (req, res) => {
   try {
+    if (req.user.role !== 'user') {
+      return res.status(403).json({ error: 'Access denied. Users only.' });
+    }
     const budgets = await Budget.find({ user: req.user.id });
     const budgetsWithAlerts = budgets.map((budget) => {
       const totalSpent = budget.spendings.reduce((sum, spending) => sum + spending.spent, 0);
@@ -63,6 +70,10 @@ router.get('/all', authMiddleware, async (req, res) => {
 
 // Update a budget
 router.put('/:id', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
     const budget = await Budget.findByIdAndUpdate(
       req.params.id,
@@ -77,6 +88,10 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
 // Delete a budget
 router.delete('/:id', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
     await Budget.findByIdAndDelete(req.params.id);
     res.json({ message: 'Budget deleted' });
@@ -87,6 +102,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
 // Add or update spending for a budget
 router.put('/:id/spendings/:spendingId', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   const { spentAmount } = req.body;
   try {
     const budget = await Budget.findById(req.params.id);
@@ -115,6 +134,10 @@ router.put('/:id/spendings/:spendingId', authMiddleware, async (req, res) => {
 
 // Delete a spending category
 router.delete('/:id/spendings/:spendingId', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
     const budget = await Budget.findById(req.params.id);
     if (!budget) {
@@ -211,6 +234,10 @@ router.post("/recommendations", authMiddleware, async (req, res) => {
 
 // Route to get budget recommendations
 router.get("/recommendations", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
     const userId = req.user.id;
     const budgets = await Budget.find({ user: userId });
@@ -231,6 +258,10 @@ router.get("/recommendations", authMiddleware, async (req, res) => {
 
 // Route to delete a recommendation
 router.delete("/recommendations/:id", authMiddleware, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ error: 'Access denied. Users only.' });
+  }
+
   try {
     const { id } = req.params;
     await Recommendation.findOneAndDelete({ id });

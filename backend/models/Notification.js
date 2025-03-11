@@ -6,7 +6,7 @@ const NotificationSchema = new mongoose.Schema({
     type: {
         type: String,
         enum: ['transaction', 'budget', 'goal', 'bill'], // Add 'bill' here
-        required: true,
+       
     },
     read: { type: Boolean, default: false },
 }, { timestamps: true });

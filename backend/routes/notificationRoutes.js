@@ -16,6 +16,10 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // Mark notification as read
 router.put('/:id/read', authMiddleware, async (req, res) => {
+    if (req.user.role !== 'user') {
+        return res.status(403).json({ error: 'Access denied. Users only.' });
+      }
+    
     try {
         const notification = await Notification.findOneAndUpdate(
             { _id: req.params.id, user: req.user.id },
@@ -35,6 +39,10 @@ router.put('/:id/read', authMiddleware, async (req, res) => {
 
 // Delete a notification
 router.delete('/:id', authMiddleware, async (req, res) => {
+    if (req.user.role !== 'user') {
+        return res.status(403).json({ error: 'Access denied. Users only.' });
+      }
+    
     try {
         await Notification.findOneAndDelete({ _id: req.params.id, user: req.user.id });
         res.json({ message: 'Notification deleted' });
