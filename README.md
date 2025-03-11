@@ -14,7 +14,7 @@ Steps to Set Up the Project
 
 1. Clone the Repository
 bash
-git clone [https://github.com/your-username/fintrack.git](https://github.com/SE1020-IT2070-OOP-DSA-25/project-it22003478.git)
+git clone (https://github.com/SE1020-IT2070-OOP-DSA-25/project-it22003478.git)
 cd fintrack
 
 
