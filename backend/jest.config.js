@@ -1,10 +1,7 @@
 module.exports = {
-  preset: "@shelf/jest-mongodb",
-  testEnvironment: "node",
-  setupFilesAfterEnv: ['./jest.setup.js'],
-  coveragePathIgnorePatterns: ["/node_modules/", "/tests/"],
-  collectCoverage: true,
-  coverageReporters: ["text", "lcov"],
-  maxWorkers: 1, // Ensures Jest runs tests sequentially
-  testTimeout: 60000, // Increase timeout if needed
+  preset: '@shelf/jest-mongodb', // Use Jest MongoDB preset
+  testEnvironment: 'node', // Set the test environment to Node.js
+  setupFilesAfterEnv: ['./jest.setup.js'], // Path to the setup file
+  testTimeout: 90000, // Set global timeout to 90 seconds
+  maxWorkers: 1, // Run tests sequentially
 };

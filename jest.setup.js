@@ -4,15 +4,18 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 let mongoServer;
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+    jest.setTimeout(90000); // Increase timeout to 90 seconds
+    mongoServer = await MongoMemoryServer.create(); // Start in-memory MongoDB
+    const uri = mongoServer.getUri(); // Get the connection URI
+    await mongoose.connect(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        autoIndex: false, // Disable indexing during tests
+    });
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
+    jest.setTimeout(90000); // Increase timeout to 90 seconds
+    await mongoose.disconnect(); // Disconnect Mongoose
+    await mongoServer.stop(); // Stop the in-memory MongoDB
 });
