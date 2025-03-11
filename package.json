@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\"",
-    "test": "jest --setupFiles dotenv/config",
+    "test": "cross-env NODE_ENV=test jest --runInBand",
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
     "test:security": "jest tests/security",

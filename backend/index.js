@@ -28,6 +28,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/currencies", currencyRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use('/api/users', require('./controllers/userController'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

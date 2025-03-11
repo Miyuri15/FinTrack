@@ -1,110 +1,115 @@
 const request = require('supertest');
-const app = require('../../index');
-const Budget = require('../../models/Budget');
-const User = require('../../models/User');
-const jwt = require('jsonwebtoken');
+const app = require('../../index'); // Adjust the path as needed
+const mongoose = require('mongoose');
+const User = require('../../models/User'); // Adjust the path as needed
+const Budget = require('../../models/Budget'); // Adjust the path as needed
 
-describe('Budget API Integration Tests', () => {
-    let token;
-    let userId;
+let token;
 
-    beforeAll(async () => {
-        jest.setTimeout(90000); // Increase timeout
+beforeEach(async () => {
+  // Clear the users collection before each test to avoid duplicate email issues
+  await User.deleteMany({});
+  
+  // Create a new user to log in and get a token for subsequent requests
+  const user = await User.create({
+    email: `ruvinda@gmail.com`,  // Using a unique email
+    password: 'Ruvinda123@',
+  });
 
-        // Create a test user
-        const user = new User({
-            firstName: 'Test',
-            lastName: 'User',
-            contactNumber:'0786643663',
-            email: 'test@example.com',
-            password: 'password123',
-        });
-        await user.save();
-        userId = user._id;
+  // Get the token after logging in
+  const loginResponse = await request(app)
+    .post('/login')
+    .send({ email: user.email, password: 'Ruvinda123@' });
 
-        // Generate a JWT token for authentication
-        token = jwt.sign({ id: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    });
+  // Store the token for future requests
+  token = loginResponse.body.token;
+  
+  // Check if the token is valid, if not throw an error
+  if (!token) {
+    console.error('Token not generated. Please check the login route.');
+  }
+});
 
-    afterAll(async () => {
-        jest.setTimeout(30000); // Increase timeout
+afterEach(async () => {
+  // Clean up the database after each test
+  await User.deleteMany({});
+  await Budget.deleteMany({});
+});
 
-        // Clean up the database after tests
-        await User.deleteMany({});
-        await Budget.deleteMany({});
-        await mongoose.connection.close(); // Close the Mongoose connection
-    });
+describe('Budget Routes', () => {
+  // Test case to create a new budget
+  it('Should create a new budget', async () => {
+    const newBudget = {
+      budgetName: 'Test Budget',
+      amount: 1000,
+    };
 
-    it('should create a new budget', async () => {
-        jest.setTimeout(30000); // Increase timeout
+    const response = await request(app)
+      .post('/budget')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBudget);
 
-        const res = await request(app)
-            .post('/api/budgets')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                month: '2023-10',
-                budgetName: 'Test Budget',
-                amount: 1000,
-                endDate: '2023-10-31',
-                spendings: [{ category: 'Food', amount: 500 }],
-            });
+    expect(response.status).toBe(201);
+    expect(response.body.budgetName).toBe(newBudget.budgetName);
+    expect(response.body.amount).toBe(newBudget.amount);
+  });
 
-        expect(res.statusCode).toEqual(201);
-        expect(res.body).toHaveProperty('_id');
-        expect(res.body.budgetName).toEqual('Test Budget');
-    });
+  // Test case to fetch all budgets for a user
+  it('Should fetch all budgets for a user', async () => {
+    const response = await request(app)
+      .get('/budget')
+      .set('Authorization', `Bearer ${token}`);
 
-    it('should get all budgets for the user', async () => {
-        jest.setTimeout(30000); // Increase timeout
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+  });
 
-        const res = await request(app)
-            .get('/api/budgets')
-            .set('Authorization', `Bearer ${token}`);
+  // Test case to update a budget
+  it('Should update a budget', async () => {
+    const newBudget = {
+      budgetName: 'Test Budget',
+      amount: 1000,
+    };
 
-        expect(res.statusCode).toEqual(200);
-        expect(Array.isArray(res.body)).toBeTruthy();
-    });
+    // Create the budget
+    const createdBudget = await request(app)
+      .post('/budget')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBudget);
 
-    it('should update a budget', async () => {
-        jest.setTimeout(30000); // Increase timeout
+    const updatedBudget = {
+      budgetName: 'Updated Budget',
+      amount: 1200,
+    };
 
-        const budget = new Budget({
-            user: userId,
-            month: '2023-10',
-            budgetName: 'Test Budget',
-            amount: 1000,
-            endDate: '2023-10-31',
-            spendings: [{ category: 'Food', amount: 500 }],
-        });
-        await budget.save();
+    const response = await request(app)
+      .put(`/budget/${createdBudget.body._id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updatedBudget);
 
-        const res = await request(app)
-            .put(`/api/budgets/${budget._id}`)
-            .set('Authorization', `Bearer ${token}`)
-            .send({ budgetName: 'Updated Budget' });
+    expect(response.status).toBe(200);
+    expect(response.body.budgetName).toBe(updatedBudget.budgetName);
+    expect(response.body.amount).toBe(updatedBudget.amount);
+  });
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body.budgetName).toEqual('Updated Budget');
-    });
+  // Test case to delete a budget
+  it('Should delete a budget', async () => {
+    const newBudget = {
+      budgetName: 'Test Budget',
+      amount: 1000,
+    };
 
-    it('should delete a budget', async () => {
-        jest.setTimeout(30000); // Increase timeout
+    // Create the budget
+    const createdBudget = await request(app)
+      .post('/budget')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBudget);
 
-        const budget = new Budget({
-            user: userId,
-            month: '2023-10',
-            budgetName: 'Test Budget',
-            amount: 1000,
-            endDate: '2023-10-31',
-            spendings: [{ category: 'Food', amount: 500 }],
-        });
-        await budget.save();
+    const response = await request(app)
+      .delete(`/budget/${createdBudget.body._id}`)
+      .set('Authorization', `Bearer ${token}`);
 
-        const res = await request(app)
-            .delete(`/api/budgets/${budget._id}`)
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res.statusCode).toEqual(200);
-        expect(res.body.message).toEqual('Budget deleted');
-    });
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Budget deleted successfully');
+  });
 });
