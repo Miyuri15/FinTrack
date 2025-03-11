@@ -14,7 +14,7 @@ Steps to Set Up the Project
 
 1. Clone the Repository
 bash
-git clone https://github.com/your-username/fintrack.git
+git clone (https://github.com/SE1020-IT2070-OOP-DSA-25/project-it22003478.git)
 cd fintrack
 
 
@@ -105,12 +105,12 @@ Since no automated security test script was created, this process was performed 
 Run Performance Tests
 Performance testing was conducted to evaluate the API’s ability to handle multiple requests simultaneously.
 We used Artillery.io for load testing.
-```bash
+bash
 npm run test:performance
 npx artillery run tests/performance/load-test.yml
-```
 
----
+
+
 
 API Documentation
 
