@@ -9,7 +9,7 @@
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
     "test:security": "jest tests/security",
-    "test:performance": "artillery run tests/performance/load-test.yml",
+    "test:performance": "artillery run tests/performance/performance.yml",
     "coverage": "jest --coverage"
   },
   "keywords": [],

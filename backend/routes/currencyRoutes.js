@@ -5,8 +5,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-const EXCHANGE_RATES_API_KEY = "918812f109dec6f8b8fd24e5cdb9f526"; // Replace with your API key
-const EXCHANGE_RATES_API_URL = "https://api.exchangeratesapi.io/v1/latest?access_key=918812f109dec6f8b8fd24e5cdb9f526";
+const EXCHANGE_RATES_API_KEY = "bb1ff0db1d97e6dc3b83f327a65eec9e"; // Replace with your API key
+const EXCHANGE_RATES_API_URL = "https://api.exchangeratesapi.io/v1/latest?access_key=bb1ff0db1d97e6dc3b83f327a65eec9e";
 
 // Fetch all currencies
 router.get("/", authMiddleware, async (req, res) => {

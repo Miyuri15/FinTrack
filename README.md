@@ -107,7 +107,7 @@ Performance testing was conducted to evaluate the API’s ability to handle mult
 We used Artillery.io for load testing.
 bash
 npm run test:performance
-npx artillery run tests/performance/load-test.yml
+npx artillery run tests/performance/performance.yml
 
 
 
@@ -116,6 +116,7 @@ API Documentation
 
 Exchange Rates API
 This project integrates an external Exchange Rates API to provide currency exchange data.
+https://manage.exchangeratesapi.io/
 
 Postman API Documentation
 You can find the API documentation on Postman:
